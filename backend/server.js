@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const matchRoutes = require('./routes/matchRoutes');
 const exchangeRoutes = require('./routes/exchangeRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/match', matchRoutes);
 app.use('/api/exchange', exchangeRoutes);
+app.use('/api/chat', chatRoutes);
 
 
 // Health check

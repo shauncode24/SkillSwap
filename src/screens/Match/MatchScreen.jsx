@@ -154,6 +154,17 @@ export default function MatchScreen() {
             </TouchableOpacity>
           </View>
         )}
+        
+        {req.status === 'accepted' && (
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}
+              onPress={() => navigation.navigate('Chat', { requestId: req._id, otherUser })}
+            >
+              <Text style={styles.actionBtnText}>Open Chat</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   };
