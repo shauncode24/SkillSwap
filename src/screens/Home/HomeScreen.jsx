@@ -1,50 +1,92 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser, selectAuth } from '../../redux/slices/authSlice';
 import { fetchMyProfile } from '../../redux/slices/userSlice';
+import { fetchMySessions, selectUpcomingSessions, selectPastSessions, selectSessionLoading } from '../../redux/slices/sessionSlice';
 import theme from '../../theme';
+
+function formatSessionDate(dateStr) {
+  const date = new Date(dateStr);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+  return date.toLocaleDateString(undefined, options);
+}
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
   const { user } = useSelector(selectAuth);
+  
+  const upcomingSessions = useSelector(selectUpcomingSessions);
+  const pastSessions = useSelector(selectPastSessions);
+  const loading = useSelector(selectSessionLoading);
 
-  // Load the user profile into Redux as soon as the app opens
   useEffect(() => {
     dispatch(fetchMyProfile());
+    dispatch(fetchMySessions());
   }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
   };
 
+  const renderSessionCard = (session) => {
+    const otherParticipant = session.participants?.find(p => p._id !== user._id) || {};
+    
+    let badgeColor = theme.colors.subtext;
+    if (session.status === 'scheduled') badgeColor = '#4CAF50';
+    if (session.status === 'cancelled') badgeColor = theme.colors.error;
+
+    return (
+      <View key={session._id} style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>{session.skill}</Text>
+          <View style={[styles.badge, { backgroundColor: badgeColor }]}>
+            <Text style={styles.badgeText}>{session.status}</Text>
+          </View>
+        </View>
+        <Text style={styles.cardText}><Text style={{fontWeight: 'bold'}}>With:</Text> {otherParticipant.name || 'Unknown'}</Text>
+        <Text style={styles.cardText}>{formatSessionDate(session.scheduledTime)}</Text>
+        <Text style={styles.cardText}><Text style={{fontWeight: 'bold'}}>Duration:</Text> {session.duration} mins</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* Welcome Section */}
       <View style={styles.welcomeSection}>
-        <Text style={styles.greeting}>Welcome back,</Text>
-        <Text style={styles.userName}>{user?.name || 'User'} 👋</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+          <View>
+            <Text style={styles.greeting}>Welcome back,</Text>
+            <Text style={styles.userName}>{user?.name || 'User'} 👋</Text>
+          </View>
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+            <Text style={styles.logoutBtnText}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.subtitle}>Ready to swap some skills?</Text>
       </View>
 
-      {/* Placeholder Content */}
-      <View style={styles.card}>
-        <Text style={styles.cardEmoji}>🚀</Text>
-        <Text style={styles.cardTitle}>You're all set!</Text>
-        <Text style={styles.cardText}>
-          Your profile and dashboard features are coming soon. Stay tuned for skill matching,
-          sessions, and community features.
-        </Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {loading && (!upcomingSessions?.length && !pastSessions?.length) ? (
+          <ActivityIndicator size="large" color={theme.colors.primary} style={{marginTop: 40}} />
+        ) : (
+          <>
+            <Text style={styles.sectionHeader}>Upcoming Sessions</Text>
+            {upcomingSessions && upcomingSessions.length > 0 ? (
+              upcomingSessions.map(renderSessionCard)
+            ) : (
+              <Text style={styles.emptyText}>No upcoming sessions scheduled yet</Text>
+            )}
 
-      {/* Logout Button */}
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={handleLogout}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
+            <Text style={[styles.sectionHeader, {marginTop: 30}]}>Past Sessions</Text>
+            {pastSessions && pastSessions.length > 0 ? (
+              pastSessions.map(renderSessionCard)
+            ) : (
+              <Text style={styles.emptyText}>No past sessions</Text>
+            )}
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -53,11 +95,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    paddingHorizontal: theme.spacing.xl,
-    paddingTop: 80,
+    paddingTop: 60,
   },
   welcomeSection: {
-    marginBottom: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.xl,
+    paddingBottom: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border
   },
   greeting: {
     fontSize: theme.fontSizes.md,
@@ -71,44 +115,68 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: theme.fontSizes.md,
-    color: theme.colors.subtext,
+    color: theme.colors.primary,
   },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.xl,
-    alignItems: 'center',
+  logoutBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: theme.spacing.xl,
+    borderColor: theme.colors.error,
+    borderRadius: 8,
   },
-  cardEmoji: {
-    fontSize: 48,
-    marginBottom: theme.spacing.md,
+  logoutBtnText: {
+    color: theme.colors.error,
+    fontWeight: '600'
   },
-  cardTitle: {
+  scrollContent: {
+    paddingHorizontal: theme.spacing.xl,
+    paddingBottom: 40,
+    paddingTop: 10
+  },
+  sectionHeader: {
     fontSize: theme.fontSizes.lg,
     fontWeight: '700',
     color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
   },
-  cardText: {
-    fontSize: theme.fontSizes.sm,
+  emptyText: {
     color: theme.colors.subtext,
-    textAlign: 'center',
-    lineHeight: 20,
+    fontStyle: 'italic',
+    marginBottom: 20
   },
-  logoutButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: theme.spacing.md,
+  card: {
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.error,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.md
   },
-  logoutText: {
-    color: theme.colors.error,
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  cardTitle: {
     fontSize: theme.fontSizes.md,
     fontWeight: '700',
+    color: theme.colors.text
   },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+    textTransform: 'uppercase'
+  },
+  cardText: {
+    color: theme.colors.text,
+    fontSize: theme.fontSizes.sm,
+    marginBottom: 4
+  }
 });

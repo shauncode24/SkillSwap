@@ -112,6 +112,13 @@ export default function ChatScreen({ route, navigation }) {
            <AvatarInitials name={otherUser?.name} />
            <Text style={styles.headerName}>{otherUser?.name || 'User'}</Text>
         </View>
+
+        <TouchableOpacity 
+           style={styles.scheduleBtn} 
+           onPress={() => navigation.navigate('Session', { requestId, offeredSkill: chat?.requestId?.offeredSkill || '' })}
+        >
+           <Text style={styles.scheduleBtnText}>Schedule Session</Text>
+        </TouchableOpacity>
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -175,6 +182,7 @@ const styles = StyleSheet.create({
   headerInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   backBtn: {
     marginRight: 15,
@@ -189,6 +197,17 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSizes.lg,
     fontWeight: '700',
     marginLeft: 10,
+  },
+  scheduleBtn: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  scheduleBtnText: {
+    color: theme.colors.background,
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   avatar: {
     backgroundColor: theme.colors.primary,
