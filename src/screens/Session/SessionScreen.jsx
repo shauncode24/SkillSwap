@@ -102,7 +102,16 @@ export default function SessionScreen({ route, navigation }) {
       scheduledTime: date.toISOString(),
       duration
     })).unwrap().then(() => {
-      // success!
+      dispatch(fetchSessionsByRequest(requestId)).unwrap().then(sessions => {
+         sessions.forEach(s => {
+            if (s.status === 'completed') {
+               apiFetch(`/api/review/session/${s._id}`, { method: 'GET' }, token)
+                 .then(res => setReviewsBySession(prev => ({ ...prev, [s._id]: res.data })))
+                 .catch(() => {});
+            }
+         });
+      });
+      setSkill('');
     }).catch(err => {
       // handled by error state
     });
@@ -113,6 +122,7 @@ export default function SessionScreen({ route, navigation }) {
       if (res?.canReview) {
         setCanReviewSessions(prev => ({ ...prev, [sessionId]: true }));
       }
+      dispatch(fetchSessionsByRequest(requestId));
     }).catch(err => {
       // handled
     });
