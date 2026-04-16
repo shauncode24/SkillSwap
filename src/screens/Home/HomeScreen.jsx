@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser, selectAuth } from '../../redux/slices/authSlice';
+import { fetchMyProfile } from '../../redux/slices/userSlice';
 import theme from '../../theme';
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
   const { user } = useSelector(selectAuth);
+
+  // Load the user profile into Redux as soon as the app opens
+  useEffect(() => {
+    dispatch(fetchMyProfile());
+  }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
