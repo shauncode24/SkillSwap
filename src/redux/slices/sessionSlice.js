@@ -66,6 +66,7 @@ const sessionSlice = createSlice({
     pastSessions: [],
     requestSessions: [],
     loading: false,
+    updatingId: null,
     creating: false,
     error: null,
   },
@@ -113,30 +114,32 @@ const sessionSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(updateSessionStatus.pending, (state) => {
-         state.loading = true;
+      .addCase(updateSessionStatus.pending, (state, action) => {
+         state.updatingId = action.meta.arg.sessionId;
          state.error = null;
       })
       .addCase(updateSessionStatus.fulfilled, (state, action) => {
-         state.loading = false;
+         state.updatingId = null;
          const updated = action.payload.data;
          
-         const reqIdx = state.requestSessions.findIndex(s => s._id === updated._id);
-         if (reqIdx !== -1) state.requestSessions[reqIdx] = updated;
+         if (updated) {
+           const reqIdx = state.requestSessions.findIndex(s => s._id === updated._id);
+           if (reqIdx !== -1) state.requestSessions[reqIdx] = updated;
 
-         const upIdx = state.upcomingSessions.findIndex(s => s._id === updated._id);
-         if (upIdx !== -1) {
-            state.upcomingSessions.splice(upIdx, 1);
-            state.pastSessions.push(updated); 
-         }
+           const upIdx = state.upcomingSessions.findIndex(s => s._id === updated._id);
+           if (upIdx !== -1) {
+              state.upcomingSessions.splice(upIdx, 1);
+              state.pastSessions.push(updated); 
+           }
 
-         const pastIdx = state.pastSessions.findIndex(s => s._id === updated._id);
-         if (pastIdx !== -1) {
-             state.pastSessions[pastIdx] = updated;
+           const pastIdx = state.pastSessions.findIndex(s => s._id === updated._id);
+           if (pastIdx !== -1) {
+               state.pastSessions[pastIdx] = updated;
+           }
          }
       })
       .addCase(updateSessionStatus.rejected, (state, action) => {
-         state.loading = false;
+         state.updatingId = null;
          state.error = action.payload;
       });
   }
@@ -146,6 +149,7 @@ export const selectUpcomingSessions = (state) => state.session.upcomingSessions;
 export const selectPastSessions = (state) => state.session.pastSessions;
 export const selectRequestSessions = (state) => state.session.requestSessions;
 export const selectSessionLoading = (state) => state.session.loading;
+export const selectSessionUpdatingId = (state) => state.session.updatingId;
 export const selectSessionCreating = (state) => state.session.creating;
 export const selectSessionError = (state) => state.session.error;
 

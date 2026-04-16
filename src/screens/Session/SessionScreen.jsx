@@ -9,14 +9,33 @@ import {
   selectRequestSessions,
   selectSessionCreating,
   selectSessionError,
-  selectSessionLoading
+  selectSessionLoading,
+  selectSessionUpdatingId
 } from '../../redux/slices/sessionSlice';
+import { apiFetch } from '../../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 import theme from '../../theme';
 
 function formatSessionDate(dateStr) {
   const date = new Date(dateStr);
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' };
   return date.toLocaleDateString(undefined, options);
+}
+
+function StarRating({ rating = 0 }) {
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5;
+  const stars = [];
+  for (let i = 0; i < 5; i++) {
+    if (i < full) stars.push('★');
+    else if (i === full && half) stars.push('½');
+    else stars.push('☆');
+  }
+  return (
+    <View style={styles.starRow}>
+      <Text style={styles.starText}>{stars.join('')}</Text>
+    </View>
+  );
 }
 
 export default function SessionScreen({ route, navigation }) {
@@ -33,14 +52,27 @@ export default function SessionScreen({ route, navigation }) {
   const existingSessions = useSelector(selectRequestSessions);
   const creating = useSelector(selectSessionCreating);
   const loading = useSelector(selectSessionLoading);
+  const updatingId = useSelector(selectSessionUpdatingId);
   const sessionError = useSelector(selectSessionError);
-  const { user } = useSelector(state => state.auth);
+  const { user, token } = useSelector(state => state.auth);
 
   const [canReviewSessions, setCanReviewSessions] = useState({});
+  const [reviewsBySession, setReviewsBySession] = useState({});
 
-  useEffect(() => {
-    dispatch(fetchSessionsByRequest(requestId));
-  }, [dispatch, requestId]);
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch(fetchSessionsByRequest(requestId)).unwrap().then(sessions => {
+         sessions.forEach(s => {
+            if (s.status === 'completed') {
+               apiFetch(`/api/review/session/${s._id}`, { method: 'GET' }, token)
+                 .then(res => {
+                    setReviewsBySession(prev => ({ ...prev, [s._id]: res.data }));
+                 }).catch(() => {});
+            }
+         });
+      });
+    }, [dispatch, requestId, token])
+  );
 
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
@@ -103,22 +135,30 @@ export default function SessionScreen({ route, navigation }) {
         <Text style={styles.cardText}>{formatSessionDate(session.scheduledTime)}</Text>
         <Text style={styles.cardText}>{session.duration} mins</Text>
 
-         {session.status === 'scheduled' && (
+        {session.status === 'scheduled' && (
           <View style={styles.actionsBox}>
-            <TouchableOpacity style={[styles.actionBtn, styles.completeBtn]} onPress={() => handleStatusUpdate(session._id, 'completed')}>
-               <Text style={styles.actionBtnText}>Mark Complete</Text>
+            <TouchableOpacity 
+              style={[styles.actionBtn, styles.completeBtn, updatingId === session._id && {opacity: 0.5}]} 
+              onPress={() => handleStatusUpdate(session._id, 'completed')}
+              disabled={updatingId === session._id}
+            >
+               {updatingId === session._id ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.actionBtnText}>Mark Complete</Text>}
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionBtn, styles.cancelBtn]} onPress={() => handleStatusUpdate(session._id, 'cancelled')}>
+            <TouchableOpacity 
+              style={[styles.actionBtn, styles.cancelBtn, updatingId === session._id && {opacity: 0.5}]} 
+              onPress={() => handleStatusUpdate(session._id, 'cancelled')}
+              disabled={updatingId === session._id}
+            >
                <Text style={styles.actionBtnText}>Cancel Session</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {session.status === 'completed' && (canReviewSessions[session._id] || true) && (
+        {session.status === 'completed' && (
           <View style={styles.reviewPrompt}>
             {session.feedbackGiven?.includes(user._id || user.id) ? (
-               <Text style={styles.reviewSubText}>Review submitted</Text>
-            ) : (
+               <Text style={styles.reviewSubText}>✓ Review submitted</Text>
+            ) : (canReviewSessions[session._id] || true) ? (
                <>
                  <Text style={styles.reviewPromptText}>Session complete! Leave a review for your partner.</Text>
                  <TouchableOpacity 
@@ -136,6 +176,19 @@ export default function SessionScreen({ route, navigation }) {
                    <Text style={styles.leaveReviewBtnText}>Leave Review</Text>
                  </TouchableOpacity>
                </>
+            ) : null}
+
+            {reviewsBySession[session._id] && reviewsBySession[session._id].length > 0 && (
+              <View style={styles.reviewsList}>
+                <Text style={styles.reviewsListTitle}>Reviews for this session:</Text>
+                {reviewsBySession[session._id].map(rev => (
+                  <View key={rev._id} style={styles.singleReview}>
+                     <Text style={styles.reviewerName}>{rev.reviewer?.name} reviewed {rev.reviewee?.name === user.name ? 'You' : rev.reviewee?.name}</Text>
+                     <StarRating rating={rev.rating} />
+                     {rev.comment ? <Text style={styles.reviewComment}>{rev.comment}</Text> : null}
+                  </View>
+                ))}
+              </View>
             )}
           </View>
         )}
@@ -443,5 +496,44 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     fontStyle: 'italic',
     fontWeight: '600',
+    marginTop: 5,
+  },
+  reviewsList: {
+    marginTop: 15,
+    width: '100%',
+    backgroundColor: theme.colors.background,
+    padding: 10,
+    borderRadius: 8,
+  },
+  reviewsListTitle: {
+    color: theme.colors.text,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    fontSize: theme.fontSizes.sm,
+  },
+  singleReview: {
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    paddingBottom: 8,
+  },
+  reviewerName: {
+    color: theme.colors.text,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  reviewComment: {
+    color: theme.colors.subtext,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  starRow: {
+    flexDirection: 'row',
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  starText: {
+    color: '#FFD700',
+    fontSize: 14,
   }
 });
