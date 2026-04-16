@@ -23,6 +23,7 @@ import {
   selectRequestLoading,
   selectMatchError
 } from '../../redux/slices/matchSlice';
+import { fetchReviewsByUser, selectUserReviews } from '../../redux/slices/reviewSlice';
 import theme from '../../theme';
 
 // ── Helper: Avatar with initials ──
@@ -91,6 +92,7 @@ export default function ViewProfileScreen({ route, navigation }) {
   const currentUser = useSelector(selectUserProfile);
   const requestLoading = useSelector(selectRequestLoading);
   const matchError = useSelector(selectMatchError);
+  const userReviews = useSelector(selectUserReviews);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [offeredSkill, setOfferedSkill] = useState('');
@@ -103,6 +105,7 @@ export default function ViewProfileScreen({ route, navigation }) {
   useEffect(() => {
     if (userId) {
       dispatch(fetchUserById(userId));
+      dispatch(fetchReviewsByUser(userId));
     }
   }, [dispatch, userId]);
 
@@ -323,6 +326,31 @@ export default function ViewProfileScreen({ route, navigation }) {
         )}
       </View>
 
+      {/* Reviews */}
+      <View style={styles.card}>
+        <Text style={styles.cardLabel}>Reviews</Text>
+        <Text style={styles.reviewAverage}>⭐ {user.rating ? user.rating.toFixed(1) : 'No rating'}</Text>
+        {userReviews && userReviews.length > 0 ? (
+          userReviews.map((rev, idx) => (
+            <View key={idx} style={styles.reviewItem}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                 <AvatarInitials name={rev.reviewer?.name} size={30} />
+                 <Text style={{marginLeft: 8, fontWeight: 'bold', color: theme.colors.text}}>{rev.reviewer?.name}</Text>
+                 <Text style={{marginLeft: 'auto', color: theme.colors.subtext, fontSize: 12}}>
+                    {new Date(rev.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                 </Text>
+              </View>
+              <View style={{marginVertical: 4}}>
+                <StarRating rating={rev.rating} />
+              </View>
+              {rev.comment ? <Text style={{color: theme.colors.text}}>{rev.comment}</Text> : null}
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No reviews yet</Text>
+        )}
+      </View>
+
       <TouchableOpacity
         style={styles.requestBtn}
         activeOpacity={0.8}
@@ -501,6 +529,20 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSizes.sm,
     color: theme.colors.subtext,
     flex: 1,
+  },
+
+  // ── Reviews ──
+  reviewAverage: {
+    color: theme.colors.primary,
+    fontSize: theme.fontSizes.lg,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  reviewItem: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    paddingTop: 10,
+    marginTop: 10,
   },
 
   requestBtn: {

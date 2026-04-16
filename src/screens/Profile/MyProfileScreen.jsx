@@ -16,6 +16,7 @@ import {
   selectUserLoading,
   selectUserError,
 } from '../../redux/slices/userSlice';
+import { fetchReviewsByUser, selectUserReviews } from '../../redux/slices/reviewSlice';
 import theme from '../../theme';
 
 // ── Helper: Avatar with initials ──
@@ -105,6 +106,8 @@ export default function MyProfileScreen() {
   const profile = useSelector(selectUserProfile);
   const loading = useSelector(selectUserLoading);
   const error = useSelector(selectUserError);
+  const authUser = useSelector(state => state.auth.user);
+  const userReviews = useSelector(selectUserReviews);
 
   const [editMode, setEditMode] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -129,7 +132,10 @@ export default function MyProfileScreen() {
     dispatch(fetchMyProfile()).then(() => {
       setInitialLoadDone(true);
     });
-  }, [dispatch]);
+    if (authUser && (authUser._id || authUser.id)) {
+       dispatch(fetchReviewsByUser(authUser._id || authUser.id));
+    }
+  }, [dispatch, authUser]);
 
   // ── When profile loads or changes, hydrate edit fields (and handle new-user) ──
   useEffect(() => {
@@ -498,6 +504,31 @@ export default function MyProfileScreen() {
         )}
       </View>
 
+      {/* Reviews */}
+      <View style={styles.card}>
+        <Text style={styles.cardLabel}>Reviews</Text>
+        <Text style={styles.reviewAverage}>⭐ {profile?.rating ? profile.rating.toFixed(1) : 'No rating'}</Text>
+        {userReviews && userReviews.length > 0 ? (
+          userReviews.map((rev, idx) => (
+            <View key={idx} style={styles.reviewItem}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                 <AvatarInitials name={rev.reviewer?.name} size={30} />
+                 <Text style={{marginLeft: 8, fontWeight: 'bold', color: theme.colors.text}}>{rev.reviewer?.name}</Text>
+                 <Text style={{marginLeft: 'auto', color: theme.colors.subtext, fontSize: 12}}>
+                    {new Date(rev.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                 </Text>
+              </View>
+              <View style={{marginVertical: 4}}>
+                <StarRating rating={rev.rating} />
+              </View>
+              {rev.comment ? <Text style={{color: theme.colors.text}}>{rev.comment}</Text> : null}
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No reviews yet</Text>
+        )}
+      </View>
+
       {/* Edit Button */}
       <TouchableOpacity
         style={styles.editBtn}
@@ -680,6 +711,20 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  // ── Reviews ──
+  reviewAverage: {
+    color: theme.colors.primary,
+    fontSize: theme.fontSizes.lg,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  reviewItem: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    paddingTop: 10,
+    marginTop: 10,
   },
 
   // ── Edit Button ──

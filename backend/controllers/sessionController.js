@@ -137,7 +137,12 @@ const updateSessionStatus = async (req, res) => {
       .populate('participants', 'name avatar')
       .populate('requestId', 'offeredSkill requestedSkill');
 
-    res.json({ success: true, data: populated });
+    const response = { success: true, data: populated };
+    if (status === 'completed') {
+      response.canReview = true;
+    }
+
+    res.json(response);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });
   }

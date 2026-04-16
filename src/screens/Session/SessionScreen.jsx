@@ -34,6 +34,9 @@ export default function SessionScreen({ route, navigation }) {
   const creating = useSelector(selectSessionCreating);
   const loading = useSelector(selectSessionLoading);
   const sessionError = useSelector(selectSessionError);
+  const { user } = useSelector(state => state.auth);
+
+  const [canReviewSessions, setCanReviewSessions] = useState({});
 
   useEffect(() => {
     dispatch(fetchSessionsByRequest(requestId));
@@ -74,7 +77,13 @@ export default function SessionScreen({ route, navigation }) {
   };
 
   const handleStatusUpdate = (sessionId, status) => {
-    dispatch(updateSessionStatus({ sessionId, status }));
+    dispatch(updateSessionStatus({ sessionId, status })).unwrap().then(res => {
+      if (res?.canReview) {
+        setCanReviewSessions(prev => ({ ...prev, [sessionId]: true }));
+      }
+    }).catch(err => {
+      // handled
+    });
   };
 
   const renderExistingSession = (session) => {
@@ -94,7 +103,7 @@ export default function SessionScreen({ route, navigation }) {
         <Text style={styles.cardText}>{formatSessionDate(session.scheduledTime)}</Text>
         <Text style={styles.cardText}>{session.duration} mins</Text>
 
-        {session.status === 'scheduled' && (
+         {session.status === 'scheduled' && (
           <View style={styles.actionsBox}>
             <TouchableOpacity style={[styles.actionBtn, styles.completeBtn]} onPress={() => handleStatusUpdate(session._id, 'completed')}>
                <Text style={styles.actionBtnText}>Mark Complete</Text>
@@ -102,6 +111,32 @@ export default function SessionScreen({ route, navigation }) {
             <TouchableOpacity style={[styles.actionBtn, styles.cancelBtn]} onPress={() => handleStatusUpdate(session._id, 'cancelled')}>
                <Text style={styles.actionBtnText}>Cancel Session</Text>
             </TouchableOpacity>
+          </View>
+        )}
+
+        {session.status === 'completed' && (canReviewSessions[session._id] || true) && (
+          <View style={styles.reviewPrompt}>
+            {session.feedbackGiven?.includes(user._id || user.id) ? (
+               <Text style={styles.reviewSubText}>Review submitted</Text>
+            ) : (
+               <>
+                 <Text style={styles.reviewPromptText}>Session complete! Leave a review for your partner.</Text>
+                 <TouchableOpacity 
+                   style={styles.leaveReviewBtn}
+                   onPress={() => {
+                     const otherParticipant = session.participants?.find(p => p._id !== (user._id || user.id));
+                     navigation.navigate('Review', {
+                        sessionId: session._id,
+                        revieweeId: otherParticipant?._id,
+                        revieweeName: otherParticipant?.name || 'User',
+                        requestId
+                     });
+                   }}
+                 >
+                   <Text style={styles.leaveReviewBtnText}>Leave Review</Text>
+                 </TouchableOpacity>
+               </>
+            )}
           </View>
         )}
       </View>
@@ -380,5 +415,33 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 12
+  },
+  reviewPrompt: {
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  reviewPromptText: {
+    color: theme.colors.text,
+    fontSize: theme.fontSizes.sm,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  leaveReviewBtn: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  leaveReviewBtnText: {
+    color: theme.colors.background,
+    fontWeight: 'bold',
+  },
+  reviewSubText: {
+    color: '#4CAF50',
+    fontStyle: 'italic',
+    fontWeight: '600',
   }
 });

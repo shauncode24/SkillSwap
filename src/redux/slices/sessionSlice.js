@@ -119,7 +119,7 @@ const sessionSlice = createSlice({
       })
       .addCase(updateSessionStatus.fulfilled, (state, action) => {
          state.loading = false;
-         const updated = action.payload;
+         const updated = action.payload.data;
          
          const reqIdx = state.requestSessions.findIndex(s => s._id === updated._id);
          if (reqIdx !== -1) state.requestSessions[reqIdx] = updated;
@@ -127,7 +127,7 @@ const sessionSlice = createSlice({
          const upIdx = state.upcomingSessions.findIndex(s => s._id === updated._id);
          if (upIdx !== -1) {
             state.upcomingSessions.splice(upIdx, 1);
-            state.pastSessions.push(updated); // Move to past conceptually, though it requires sorting, appending is ok
+            state.pastSessions.push(updated); 
          }
 
          const pastIdx = state.pastSessions.findIndex(s => s._id === updated._id);

@@ -4,6 +4,8 @@ import userReducer from './slices/userSlice';
 import matchReducer from './slices/matchSlice';
 import chatReducer from './slices/chatSlice';
 import sessionReducer from './slices/sessionSlice';
+import reviewReducer from './slices/reviewSlice';
+
 
 const store = configureStore({
   reducer: {
@@ -12,6 +14,7 @@ const store = configureStore({
     match: matchReducer,
     chat: chatReducer,
     session: sessionReducer,
+    review: reviewReducer,
   },
 });
 
