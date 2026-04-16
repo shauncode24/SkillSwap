@@ -5,6 +5,7 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import store from './src/redux/store';
 import RootNavigator from './src/navigation';
 import { loadUserFromToken, selectAuthLoading } from './src/redux/slices/authSlice';
+import { fetchNotifications, fetchUnreadCount } from './src/redux/slices/notificationSlice';
 import theme from './src/theme';
 
 function AppContent() {
@@ -19,6 +20,20 @@ function AppContent() {
       setInitializing(false);
     });
   }, [dispatch]);
+
+  // Fetch notifications and start polling for unread count when authenticated
+  useEffect(() => {
+    let intervalId;
+    if (isAuthenticated) {
+      dispatch(fetchNotifications());
+      intervalId = setInterval(() => {
+        dispatch(fetchUnreadCount());
+      }, 30000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isAuthenticated, dispatch]);
 
   // Show a loading spinner while the token check is in progress
   if (initializing) {

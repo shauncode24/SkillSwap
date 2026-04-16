@@ -5,6 +5,7 @@ import matchReducer from './slices/matchSlice';
 import chatReducer from './slices/chatSlice';
 import sessionReducer from './slices/sessionSlice';
 import reviewReducer from './slices/reviewSlice';
+import notificationReducer from './slices/notificationSlice';
 
 
 const store = configureStore({
@@ -15,6 +16,7 @@ const store = configureStore({
     chat: chatReducer,
     session: sessionReducer,
     review: reviewReducer,
+    notifications: notificationReducer,
   },
 });
 

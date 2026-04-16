@@ -1,5 +1,6 @@
 const Chat = require('../models/Chat');
 const ExchangeRequest = require('../models/ExchangeRequest');
+const { createNotification } = require('../services/notificationService');
 
 const getOrCreateChat = async (req, res) => {
   try {
@@ -67,6 +68,19 @@ const sendMessage = async (req, res) => {
     await chat.save();
     chat = await chat.populate('participants', 'name avatar');
     
+    const sender = chat.participants.find(p => p._id.toString() === req.user._id.toString());
+    const otherParticipant = chat.participants.find(p => p._id.toString() !== req.user._id.toString());
+    
+    if (otherParticipant && sender) {
+      createNotification({
+        userId: otherParticipant._id,
+        type: 'new_message',
+        message: `${sender.name} sent you a message`,
+        relatedId: chat._id,
+        relatedModel: 'Chat'
+      }).catch(err => console.error(err));
+    }
+
     res.json({ success: true, data: chat });
   } catch (error) {
     console.error(error);

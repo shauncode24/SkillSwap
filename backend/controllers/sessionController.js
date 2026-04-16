@@ -1,5 +1,19 @@
 const Session = require('../models/Session');
 const ExchangeRequest = require('../models/ExchangeRequest');
+const { createNotification } = require('../services/notificationService');
+
+function formatSessionDateObj(date) {
+  const d = new Date(date);
+  const day = d.getDate();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[d.getMonth()];
+  const year = d.getFullYear();
+  let hours = d.getHours();
+  const mins = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${day} ${month} ${year} at ${hours}:${mins} ${ampm}`;
+}
 
 const createSession = async (req, res) => {
   try {
@@ -49,6 +63,18 @@ const createSession = async (req, res) => {
 
     await session.save();
     session = await session.populate('participants', 'name avatar');
+    
+    const otherParticipant = session.participants.find(p => p._id.toString() !== req.user._id.toString());
+    if (otherParticipant) {
+      createNotification({
+        userId: otherParticipant._id,
+        type: 'session_reminder',
+        message: `A session for ${session.skill} has been scheduled on ${formatSessionDateObj(session.scheduledTime)}`,
+        relatedId: session._id,
+        relatedModel: 'Session'
+      }).catch(err => console.error(err));
+    }
+
     res.json({ success: true, data: session });
 
   } catch (error) {
@@ -140,6 +166,16 @@ const updateSessionStatus = async (req, res) => {
     const response = { success: true, data: populated };
     if (status === 'completed') {
       response.canReview = true;
+      
+      session.participants.forEach(p => {
+        createNotification({
+          userId: p._id,
+          type: 'session_completed',
+          message: `Your session for ${session.skill} is complete. Leave a review!`,
+          relatedId: session._id,
+          relatedModel: 'Session'
+        }).catch(err => console.error(err));
+      });
     }
 
     res.json(response);

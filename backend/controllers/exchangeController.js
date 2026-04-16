@@ -1,4 +1,5 @@
 const ExchangeRequest = require('../models/ExchangeRequest');
+const { createNotification } = require('../services/notificationService');
 
 const sendRequest = async (req, res) => {
   try {
@@ -35,6 +36,14 @@ const sendRequest = async (req, res) => {
 
     request = await request.populate('fromUser', 'name avatar');
     request = await request.populate('toUser', 'name avatar');
+
+    createNotification({
+      userId: toUser,
+      type: 'request_received',
+      message: `${request.fromUser.name} wants to exchange skills with you`,
+      relatedId: request._id,
+      relatedModel: 'ExchangeRequest'
+    }).catch(err => console.error(err));
 
     res.json({ success: true, data: request });
   } catch (error) {
@@ -92,6 +101,24 @@ const respondToRequest = async (req, res) => {
 
     const updatedRequest = await request.populate('fromUser', 'name avatar rating');
     await updatedRequest.populate('toUser', 'name avatar rating');
+
+    if (status === 'accepted') {
+      createNotification({
+        userId: request.fromUser._id,
+        type: 'request_accepted',
+        message: `${request.toUser.name} accepted your skill exchange request`,
+        relatedId: request._id,
+        relatedModel: 'ExchangeRequest'
+      }).catch(err => console.error(err));
+    } else if (status === 'rejected') {
+      createNotification({
+        userId: request.fromUser._id,
+        type: 'request_rejected',
+        message: `${request.toUser.name} declined your skill exchange request`,
+        relatedId: request._id,
+        relatedModel: 'ExchangeRequest'
+      }).catch(err => console.error(err));
+    }
 
     res.json({ success: true, data: updatedRequest });
   } catch (error) {

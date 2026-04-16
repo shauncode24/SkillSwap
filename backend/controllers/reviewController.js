@@ -1,6 +1,7 @@
 const Review = require('../models/Review');
 const Session = require('../models/Session');
 const User = require('../models/User');
+const { createNotification } = require('../services/notificationService');
 
 const submitReview = async (req, res) => {
   try {
@@ -53,6 +54,14 @@ const submitReview = async (req, res) => {
     }
 
     review = await review.populate('reviewer', 'name avatar');
+
+    createNotification({
+      userId: revieweeId,
+      type: 'review_received',
+      message: `${review.reviewer.name} left you a review`,
+      relatedId: review._id,
+      relatedModel: 'Review'
+    }).catch(err => console.error(err));
 
     res.json({ success: true, data: review });
   } catch (error) {

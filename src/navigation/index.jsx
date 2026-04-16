@@ -20,6 +20,7 @@ import ChatScreen from '../screens/Chat/ChatScreen';
 import SessionScreen from '../screens/Session/SessionScreen';
 import ReviewScreen from '../screens/Review/ReviewScreen';
 import CommunityScreen from '../screens/Community/CommunityScreen';
+import { selectUnreadCount } from '../redux/slices/notificationSlice';
 
 import theme from '../theme';
 
@@ -42,6 +43,8 @@ function TabIcon({ label, focused }) {
 
 // Bottom Tab Navigator (the main app tabs)
 function AppTabs() {
+  const unreadCount = useSelector(selectUnreadCount);
+  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -61,7 +64,14 @@ function AppTabs() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Discover" component={DiscoverScreen} />
       <Tab.Screen name="Match" component={MatchScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} />
+      <Tab.Screen 
+        name="Notifications" 
+        component={NotificationsScreen} 
+        options={{
+          tabBarBadge: unreadCount > 0 ? (unreadCount > 99 ? '99+' : unreadCount) : null,
+          tabBarBadgeStyle: { backgroundColor: theme.colors.error, color: '#fff' }
+        }}
+      />
       <Tab.Screen name="Profile" component={MyProfileScreen} />
     </Tab.Navigator>
   );
