@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,9 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Modal,
+  TextInput,
+  Alert
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -13,7 +16,13 @@ import {
   selectViewedUser,
   selectUserLoading,
   selectUserError,
+  selectUserProfile
 } from '../../redux/slices/userSlice';
+import {
+  sendExchangeRequest,
+  selectRequestLoading,
+  selectMatchError
+} from '../../redux/slices/matchSlice';
 import theme from '../../theme';
 
 // ── Helper: Avatar with initials ──
@@ -78,6 +87,16 @@ export default function ViewProfileScreen({ route, navigation }) {
   const user = useSelector(selectViewedUser);
   const loading = useSelector(selectUserLoading);
   const error = useSelector(selectUserError);
+  
+  const currentUser = useSelector(selectUserProfile);
+  const requestLoading = useSelector(selectRequestLoading);
+  const matchError = useSelector(selectMatchError);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [offeredSkill, setOfferedSkill] = useState('');
+  const [requestedSkill, setRequestedSkill] = useState('');
+  const [message, setMessage] = useState('');
+  const [duration, setDuration] = useState('30');
 
   const { userId } = route.params || {};
 
@@ -109,6 +128,114 @@ export default function ViewProfileScreen({ route, navigation }) {
       </View>
     );
   }
+
+  const handleSendRequest = () => {
+    if (!offeredSkill || !requestedSkill || !duration) {
+      Alert.alert('Error', 'Please select skills and duration.');
+      return;
+    }
+    dispatch(sendExchangeRequest({
+      toUser: user._id,
+      offeredSkill,
+      requestedSkill,
+      message,
+      duration: Number(duration)
+    }))
+    .unwrap()
+    .then(() => {
+      setModalVisible(false);
+      Alert.alert('Success', 'Request sent successfully!');
+    })
+    .catch((err) => {
+      // Error is caught by Redux and available in matchError
+    });
+  };
+
+  const renderModal = () => {
+    return (
+      <Modal visible={modalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalOverlay}>
+          <ScrollView contentContainerStyle={styles.modalContent}>
+            <Text style={styles.modalTitle}>Send Exchange Request</Text>
+
+            {matchError && <Text style={styles.modalError}>{matchError}</Text>}
+
+            {(!currentUser?.teachSkills || currentUser.teachSkills.length === 0) ? (
+              <View>
+                <Text style={styles.modalError}>You need to add skills to your profile before sending a request.</Text>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.cancelBtnText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                <Text style={styles.label}>Offer Skill (From your profile)</Text>
+                <View style={styles.pickerContainer}>
+                  {currentUser.teachSkills.map((s, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[styles.pickerItem, offeredSkill === s.name && styles.pickerItemActive]}
+                      onPress={() => setOfferedSkill(s.name)}
+                    >
+                      <Text style={[styles.pickerItemText, offeredSkill === s.name && styles.pickerItemActiveText]}>{s.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <Text style={styles.label}>Requested Skill (From their profile)</Text>
+                <View style={styles.pickerContainer}>
+                  {(user.teachSkills || []).map((s, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[styles.pickerItem, requestedSkill === s.name && styles.pickerItemActive]}
+                      onPress={() => setRequestedSkill(s.name)}
+                    >
+                      <Text style={[styles.pickerItemText, requestedSkill === s.name && styles.pickerItemActiveText]}>{s.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <Text style={styles.label}>Duration (minutes)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={duration}
+                  onChangeText={setDuration}
+                />
+
+                <Text style={styles.label}>Message (Optional)</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  multiline
+                  placeholder="Hey, let's exchange skills!"
+                  placeholderTextColor="#888"
+                  value={message}
+                  onChangeText={setMessage}
+                />
+
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={requestLoading}>
+                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.sendBtn, requestLoading && { opacity: 0.7 }]}
+                    onPress={handleSendRequest}
+                    disabled={requestLoading}
+                  >
+                    {requestLoading ? (
+                      <ActivityIndicator color={theme.colors.background} />
+                    ) : (
+                      <Text style={styles.sendBtnText}>Send</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </Modal>
+    );
+  };
 
   return (
     <ScrollView
@@ -196,14 +323,15 @@ export default function ViewProfileScreen({ route, navigation }) {
         )}
       </View>
 
-      {/* Placeholder Send Request button (Phase 7) */}
       <TouchableOpacity
         style={styles.requestBtn}
         activeOpacity={0.8}
-        onPress={() => {}}
+        onPress={() => setModalVisible(true)}
       >
         <Text style={styles.requestBtnText}>Send Request</Text>
       </TouchableOpacity>
+
+      {renderModal()}
     </ScrollView>
   );
 }
@@ -236,7 +364,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // ── Back button ──
   backBtn: {
     marginBottom: theme.spacing.md,
     alignSelf: 'flex-start',
@@ -247,7 +374,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // ── Profile Header ──
   profileHeader: {
     alignItems: 'center',
     marginBottom: theme.spacing.lg,
@@ -269,7 +395,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
 
-  // ── Stars ──
   starRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -284,7 +409,6 @@ const styles = StyleSheet.create({
     color: theme.colors.subtext,
   },
 
-  // ── Stats ──
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -312,7 +436,6 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
 
-  // ── Card ──
   card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.md,
@@ -338,7 +461,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // ── Skill Tags ──
   skillTag: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -363,7 +485,6 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
 
-  // ── Availability ──
   availRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -382,7 +503,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // ── Placeholder Send Request button ──
   requestBtn: {
     backgroundColor: theme.colors.secondary,
     paddingVertical: theme.spacing.md,
@@ -395,4 +515,104 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSizes.md,
     fontWeight: '700',
   },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.lg,
+  },
+  modalTitle: {
+    color: theme.colors.text,
+    fontSize: theme.fontSizes.lg,
+    fontWeight: 'bold',
+    marginBottom: theme.spacing.md,
+    textAlign: 'center'
+  },
+  modalError: {
+    color: theme.colors.error,
+    marginBottom: theme.spacing.md,
+    textAlign: 'center',
+  },
+  label: {
+    color: theme.colors.subtext,
+    fontSize: theme.fontSizes.sm,
+    marginBottom: 4,
+    marginTop: 10,
+    fontWeight: '600'
+  },
+  input: {
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderRadius: 6,
+    color: theme.colors.text,
+    padding: 10,
+  },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: 'top'
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4
+  },
+  pickerItem: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.background
+  },
+  pickerItemActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  pickerItemText: {
+    color: theme.colors.text,
+    fontSize: theme.fontSizes.sm
+  },
+  pickerItemActiveText: {
+    color: theme.colors.background,
+    fontWeight: 'bold'
+  },
+  modalActions: {
+    flexDirection: 'row',
+    marginTop: 20,
+    gap: 10
+  },
+  cancelBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    borderRadius: 6
+  },
+  cancelBtnText: {
+    color: theme.colors.text,
+    fontWeight: '600'
+  },
+  sendBtn: {
+    flex: 1,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 6
+  },
+  sendBtnText: {
+    color: theme.colors.background,
+    fontWeight: '600'
+  }
 });
