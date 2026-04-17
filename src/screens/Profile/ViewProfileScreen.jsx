@@ -27,7 +27,7 @@ import { fetchReviewsByUser, selectUserReviews } from '../../redux/slices/review
 import theme from '../../theme';
 
 // ── Helper: Avatar with initials ──
-function AvatarInitials({ name, size = 90 }) {
+function AvatarInitials({ name, size = 100 }) {
   const initials = (name || '?')
     .split(' ')
     .map((w) => w[0])
@@ -47,16 +47,6 @@ function AvatarInitials({ name, size = 90 }) {
       ]}
     >
       <Text style={[styles.avatarText, { fontSize: size * 0.38 }]}>{initials}</Text>
-    </View>
-  );
-}
-
-// ── Helper: Skill Tag ──
-function SkillTag({ skill, labelKey }) {
-  return (
-    <View style={styles.skillTag}>
-      <Text style={styles.skillTagName}>{skill.name}</Text>
-      <Text style={styles.skillTagLevel}>{skill[labelKey]}</Text>
     </View>
   );
 }
@@ -239,128 +229,153 @@ export default function ViewProfileScreen({ route, navigation }) {
       </Modal>
     );
   };
-
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-    >
-      {/* Back button */}
+    <View style={styles.container}>
+      <View style={styles.topBackground} />
+      
       <TouchableOpacity
-        style={styles.backBtn}
+        style={styles.topBackBtn}
         onPress={() => navigation.goBack()}
         activeOpacity={0.8}
       >
-        <Text style={styles.backBtnText}>← Back</Text>
+        <Text style={styles.topBackBtnText}>← Back</Text>
       </TouchableOpacity>
 
-      {/* Profile header */}
-      <View style={styles.profileHeader}>
-        <AvatarInitials name={user.name} size={90} />
-        <Text style={styles.profileName}>{user.name}</Text>
-        <StarRating rating={user.rating || 0} />
-      </View>
-
-      {/* Bio */}
-      {user.bio ? (
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Bio</Text>
-          <Text style={styles.bioText}>{user.bio}</Text>
-        </View>
-      ) : null}
-
-      {/* XP & Level */}
-      <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>{user.xp || 0}</Text>
-          <Text style={styles.statLabel}>XP</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>{user.level || 1}</Text>
-          <Text style={styles.statLabel}>Level</Text>
-        </View>
-      </View>
-
-      {/* Teach Skills */}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Skills They Teach</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {(user.teachSkills || []).length > 0 ? (
-            user.teachSkills.map((skill, idx) => (
-              <SkillTag key={`teach-${idx}`} skill={skill} labelKey="level" />
-            ))
-          ) : (
-            <Text style={styles.emptyText}>No teach skills listed</Text>
-          )}
-        </ScrollView>
-      </View>
-
-      {/* Learn Skills */}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Skills They Want to Learn</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {(user.learnSkills || []).length > 0 ? (
-            user.learnSkills.map((skill, idx) => (
-              <SkillTag key={`learn-${idx}`} skill={skill} labelKey="priority" />
-            ))
-          ) : (
-            <Text style={styles.emptyText}>No learn skills listed</Text>
-          )}
-        </ScrollView>
-      </View>
-
-      {/* Availability */}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Availability</Text>
-        {(user.availability || []).length > 0 ? (
-          user.availability.map((entry, idx) => (
-            <View key={`avail-${idx}`} style={styles.availRow}>
-              <Text style={styles.availDay}>{entry.day}</Text>
-              <Text style={styles.availSlots}>
-                {(entry.slots || []).join(', ')}
-              </Text>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.emptyText}>No availability set</Text>
-        )}
-      </View>
-
-      {/* Reviews */}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Reviews</Text>
-        <Text style={styles.reviewAverage}>⭐ {user.rating ? user.rating.toFixed(1) : 'No rating'}</Text>
-        {userReviews && userReviews.length > 0 ? (
-          userReviews.map((rev, idx) => (
-            <View key={idx} style={styles.reviewItem}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                 <AvatarInitials name={rev.reviewer?.name} size={30} />
-                 <Text style={{marginLeft: 8, fontWeight: 'bold', color: theme.colors.text}}>{rev.reviewer?.name}</Text>
-                 <Text style={{marginLeft: 'auto', color: theme.colors.subtext, fontSize: 12}}>
-                    {new Date(rev.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                 </Text>
-              </View>
-              <View style={{marginVertical: 4}}>
-                <StarRating rating={rev.rating} />
-              </View>
-              {rev.comment ? <Text style={{color: theme.colors.text}}>{rev.comment}</Text> : null}
-            </View>
-          ))
-        ) : (
-          <Text style={styles.emptyText}>No reviews yet</Text>
-        )}
-      </View>
-
-      <TouchableOpacity
-        style={styles.requestBtn}
-        activeOpacity={0.8}
-        onPress={() => setModalVisible(true)}
+      <ScrollView
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.requestBtnText}>Send Request</Text>
-      </TouchableOpacity>
+        {/* Main Profile Card */}
+        <View style={styles.profileCard}>
+        <View style={styles.avatarContainer}>
+            <AvatarInitials name={user.name} size={100} />
+            <View style={styles.checkmarkBadge}>
+              <Text style={{ fontSize: 12, color: '#1E293B', fontWeight: 'bold' }}>✔</Text>
+            </View>
+          </View>
 
-      {renderModal()}
-    </ScrollView>
+          <Text style={styles.profileName}>{user.name}</Text>
+          <Text style={styles.bioText}>{user.bio || 'Passionate about learning and sharing knowledge.'}</Text>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                <Text style={styles.statIcon}>☆ </Text>
+                <Text style={styles.statValue}>{user.rating ? user.rating.toFixed(1) : '0.0'}</Text>
+              </View>
+              <Text style={styles.statLabel}>Rating</Text>
+            </View>
+            <View style={styles.statBox}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                <Text style={styles.statIcon}>📅 </Text>
+                <Text style={styles.statValue}>{user.totalSessions || '0'}</Text>
+              </View>
+              <Text style={styles.statLabel}>Total{'\n'}Sessions</Text>
+            </View>
+            <View style={styles.statBox}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                <Text style={styles.statIcon}>👥 </Text>
+                <Text style={styles.statValue}>{user.matches || '0'}</Text>
+              </View>
+              <Text style={styles.statLabel}>Matches</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.requestBtn}
+            activeOpacity={0.8}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.requestBtnText}>💬  Send Request</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Skills They Can Teach */}
+        <Text style={styles.sectionHeading}>Skills They Teach</Text>
+        <View style={styles.tagBlockCard}>
+          {(user.teachSkills || []).length > 0 ? (
+            <View style={styles.tagContainer}>
+              {user.teachSkills.map((skill, idx) => (
+                <View key={`teach-${idx}`} style={styles.teachTag}>
+                  <Text style={styles.teachTagText}>
+                    {skill.name}  <Text style={{ color: '#818CF8', textTransform: 'capitalize' }}>({skill.level})</Text>
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>No teach skills added.</Text>
+          )}
+        </View>
+
+        {/* Skills They Want to Learn */}
+        <Text style={styles.sectionHeading}>Skills They Want to Learn</Text>
+        <View style={styles.tagBlockCard}>
+          {(user.learnSkills || []).length > 0 ? (
+            <View style={styles.tagContainer}>
+              {user.learnSkills.map((skill, idx) => (
+                <View key={`learn-${idx}`} style={styles.learnTag}>
+                  <Text style={styles.learnTagText}>
+                    {skill.name}  <Text style={{ color: '#C084FC', textTransform: 'capitalize' }}>({skill.priority})</Text>
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>No learn skills added.</Text>
+          )}
+        </View>
+
+        {/* Availability */}
+        <Text style={styles.sectionHeading}>Availability</Text>
+        <View style={styles.tagBlockCard}>
+          {(user.availability || []).length > 0 ? (
+            <View style={styles.tagContainer}>
+              {user.availability.map((entry, idx) => (
+                <View key={`avail-${idx}`} style={styles.availTag}>
+                  <Text style={styles.availTagText}>
+                    {entry.day} {(entry.slots || []).join(', ')}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>No availability set.</Text>
+          )}
+        </View>
+
+        {/* Reviews */}
+        <Text style={styles.sectionHeading}>Reviews</Text>
+        <View style={styles.tagBlockCard}>
+          <Text style={styles.reviewAverage}>
+            ⭐ {user.rating ? user.rating.toFixed(1) : 'No rating'}
+          </Text>
+          {userReviews && userReviews.length > 0 ? (
+            userReviews.map((rev, idx) => (
+              <View key={idx} style={styles.reviewItem}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <AvatarInitials name={rev.reviewer?.name} size={30} />
+                  <Text style={styles.reviewName}>{rev.reviewer?.name}</Text>
+                  <Text style={styles.reviewDate}>
+                    {new Date(rev.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </Text>
+                </View>
+                <View style={{ marginVertical: 4 }}>
+                  <StarRating rating={rev.rating} />
+                </View>
+                {rev.comment ? <Text style={styles.reviewComment}>{rev.comment}</Text> : null}
+              </View>
+            ))
+          ) : (
+            <Text style={styles.emptyText}>No reviews yet</Text>
+          )}
+        </View>
+
+        <View style={{ height: 20 }} />
+        {renderModal()}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -371,235 +386,297 @@ export default function ViewProfileScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#0F172A',
+  },
+  topBackground: {
+    backgroundColor: '#7C3AED',
+    height: 220,
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 0
+  },
+  topBackBtn: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    padding: 10,
+  },
+  topBackBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   scrollContent: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: 50,
-    paddingBottom: theme.spacing.xl * 2,
+    paddingTop: 110,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   centered: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#0F172A',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.lg,
+    padding: 20,
   },
   errorText: {
-    color: theme.colors.error,
-    fontSize: theme.fontSizes.md,
-    marginBottom: theme.spacing.md,
+    color: '#EF4444',
+    fontSize: 16,
+    marginBottom: 20,
     textAlign: 'center',
   },
-
   backBtn: {
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
     alignSelf: 'flex-start',
   },
   backBtnText: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSizes.md,
+    color: '#6366F1',
+    fontSize: 16,
     fontWeight: '600',
   },
-
-  profileHeader: {
+  
+  // ── Profile Card ──
+  profileCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    padding: 20,
     alignItems: 'center',
-    marginBottom: theme.spacing.lg,
+    marginBottom: 30,
+  },
+  avatarContainer: {
+    marginTop: -70,
+    marginBottom: 15,
+    position: 'relative',
+    alignItems: 'center'
   },
   avatar: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#0F172A',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: '#475569',
   },
   avatarText: {
-    color: theme.colors.text,
+    color: '#FFF',
     fontWeight: '700',
+  },
+  checkmarkBadge: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    backgroundColor: '#3B82F6',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#1E293B',
   },
   profileName: {
-    fontSize: theme.fontSizes.xl,
-    fontWeight: '700',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#F8FAFC',
+    marginBottom: 10,
+  },
+  bioText: {
+    fontSize: 14,
+    color: '#94A3B8',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 30,
+    paddingHorizontal: 10,
+  },
+  
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
+    marginBottom: 30,
+  },
+  statBox: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statIcon: {
+    fontSize: 16,
+    color: '#818CF8',
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#818CF8',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: '#94A3B8',
+    textAlign: 'center',
+    lineHeight: 16,
   },
 
+  requestBtn: {
+    backgroundColor: '#6366F1',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  requestBtnText: {
+    color: '#F8FAFC',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+
+  // ── Sections & Tags ──
+  sectionHeading: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#F8FAFC',
+    marginBottom: 15,
+    marginTop: 5,
+  },
+  tagBlockCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 25,
+  },
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  teachTag: {
+    backgroundColor: '#312E81',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  teachTagText: {
+    color: '#C7D2FE',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  learnTag: {
+    backgroundColor: '#581C87',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  learnTagText: {
+    color: '#E9D5FF',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  availTag: {
+    backgroundColor: '#334155',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  availTagText: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#94A3B8',
+    fontStyle: 'italic',
+  },
+
+  // ── Reviews ──
+  reviewAverage: {
+    color: '#818CF8',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  reviewItem: {
+    borderTopWidth: 1,
+    borderTopColor: '#334155',
+    paddingTop: 15,
+    marginTop: 10,
+  },
+  reviewName: {
+    marginLeft: 10,
+    fontWeight: 'bold',
+    color: '#F8FAFC',
+  },
+  reviewDate: {
+    marginLeft: 'auto',
+    color: '#64748B',
+    fontSize: 12,
+  },
+  reviewComment: {
+    color: '#E2E8F0',
+    marginTop: 5,
+    lineHeight: 20,
+  },
   starRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   starText: {
-    fontSize: theme.fontSizes.lg,
+    fontSize: 14,
     color: '#FFD700',
-    marginRight: theme.spacing.xs,
+    marginRight: 5,
   },
   ratingNumber: {
-    fontSize: theme.fontSizes.md,
-    color: theme.colors.subtext,
+    fontSize: 14,
+    color: '#94A3B8',
   },
 
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.lg,
-    gap: theme.spacing.md,
-  },
-  statBox: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    minWidth: 100,
-  },
-  statValue: {
-    fontSize: theme.fontSizes.xl,
-    fontWeight: '700',
-    color: theme.colors.primary,
-  },
-  statLabel: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.subtext,
-    marginTop: theme.spacing.xs,
-  },
-
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  cardLabel: {
-    fontSize: theme.fontSizes.md,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
-  },
-  bioText: {
-    fontSize: theme.fontSizes.md,
-    color: theme.colors.subtext,
-    lineHeight: 22,
-  },
-  emptyText: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.subtext,
-    fontStyle: 'italic',
-  },
-
-  skillTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.lg,
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.md,
-    marginRight: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
-    borderWidth: 1,
-    borderColor: theme.colors.primary + '55',
-  },
-  skillTagName: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.text,
-    fontWeight: '600',
-    marginRight: theme.spacing.xs,
-  },
-  skillTagLevel: {
-    fontSize: theme.fontSizes.sm - 1,
-    color: theme.colors.primary,
-    textTransform: 'capitalize',
-  },
-
-  availRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  availDay: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.text,
-    fontWeight: '600',
-    marginRight: theme.spacing.sm,
-    minWidth: 80,
-  },
-  availSlots: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.subtext,
-    flex: 1,
-  },
-
-  // ── Reviews ──
-  reviewAverage: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSizes.lg,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  reviewItem: {
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    paddingTop: 10,
-    marginTop: 10,
-  },
-
-  requestBtn: {
-    backgroundColor: theme.colors.secondary,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    marginTop: theme.spacing.md,
-  },
-  requestBtnText: {
-    color: theme.colors.background,
-    fontSize: theme.fontSizes.md,
-    fontWeight: '700',
-  },
-
-  // Modal Styles
+  // ── Modal Styles ──
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   modalContent: {
     width: '90%',
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.lg,
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    padding: 24,
   },
   modalTitle: {
-    color: theme.colors.text,
-    fontSize: theme.fontSizes.lg,
+    color: '#F8FAFC',
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: theme.spacing.md,
+    marginBottom: 16,
     textAlign: 'center'
   },
   modalError: {
-    color: theme.colors.error,
-    marginBottom: theme.spacing.md,
+    color: '#EF4444',
+    marginBottom: 16,
     textAlign: 'center',
   },
   label: {
-    color: theme.colors.subtext,
-    fontSize: theme.fontSizes.sm,
-    marginBottom: 4,
-    marginTop: 10,
+    color: '#94A3B8',
+    fontSize: 13,
+    marginBottom: 6,
+    marginTop: 15,
     fontWeight: '600'
   },
   input: {
-    backgroundColor: theme.colors.background,
-    borderColor: theme.colors.border,
+    backgroundColor: '#0F172A',
+    borderColor: '#334155',
     borderWidth: 1,
-    borderRadius: 6,
-    color: theme.colors.text,
-    padding: 10,
+    borderRadius: 8,
+    color: '#F8FAFC',
+    padding: 12,
   },
   textArea: {
-    minHeight: 80,
+    minHeight: 100,
     textAlignVertical: 'top'
   },
   pickerContainer: {
@@ -609,52 +686,53 @@ const styles = StyleSheet.create({
     marginTop: 4
   },
   pickerItem: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.background
+    borderColor: '#334155',
+    backgroundColor: '#0F172A'
   },
   pickerItemActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
+    backgroundColor: '#3730A3',
+    borderColor: '#6366F1',
   },
   pickerItemText: {
-    color: theme.colors.text,
-    fontSize: theme.fontSizes.sm
+    color: '#94A3B8',
+    fontSize: 13,
+    fontWeight: '500'
   },
   pickerItemActiveText: {
-    color: theme.colors.background,
+    color: '#F8FAFC',
     fontWeight: 'bold'
   },
   modalActions: {
     flexDirection: 'row',
-    marginTop: 20,
-    gap: 10
+    marginTop: 24,
+    gap: 12
   },
   cancelBtn: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: '#475569',
     alignItems: 'center',
-    borderRadius: 6
+    borderRadius: 12
   },
   cancelBtnText: {
-    color: theme.colors.text,
+    color: '#CBD5E1',
     fontWeight: '600'
   },
   sendBtn: {
     flex: 1,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#6366F1',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 6
+    paddingVertical: 14,
+    borderRadius: 12
   },
   sendBtnText: {
-    color: theme.colors.background,
-    fontWeight: '600'
+    color: '#FFF',
+    fontWeight: 'bold'
   }
 });

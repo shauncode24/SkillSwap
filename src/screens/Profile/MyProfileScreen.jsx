@@ -438,10 +438,18 @@ export default function MyProfileScreen() {
     <View style={styles.container}>
       <View style={styles.topBackground} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <TouchableOpacity style={styles.settingsIcon} onPress={() => setEditMode(true)}>
+        <Text style={{ fontSize: 20 }}>⚙️</Text>
+      </TouchableOpacity>
+
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+      >
         {/* Main Profile Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
+        <View style={styles.avatarContainer}>
             <AvatarInitials name={profile?.name} size={100} />
             <View style={styles.checkmarkBadge}><Text style={{ fontSize: 12, color: '#1E293B', fontWeight: 'bold' }}>✔</Text></View>
           </View>
@@ -540,7 +548,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
   },
   topBackground: {
-    backgroundColor: '#7C3AED', // Bright purple like the mockup top background
+    backgroundColor: '#7C3AED',
     height: 220,
     width: '100%',
     position: 'absolute',
