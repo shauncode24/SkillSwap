@@ -48,7 +48,11 @@ export default function OnboardingScreen({ navigation }) {
   };
 
   const handleNext = () => {
-    if (step < 3) setStep(step + 1);
+    if (step < 7) setStep(step + 1);
+  };
+
+  const handleSkipIntro = () => {
+    setStep(5);
   };
 
   const handleFinish = async () => {
@@ -72,7 +76,7 @@ export default function OnboardingScreen({ navigation }) {
   const renderDots = () => {
     return (
       <View style={styles.dotsContainer}>
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
           <View
             key={i}
             style={i === step ? styles.activeDot : styles.inactiveDot}
@@ -85,6 +89,54 @@ export default function OnboardingScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {step === 1 && (
+        <View style={styles.introContainer}>
+          <View style={styles.iconCircle}>
+            <Text style={styles.iconEmoji}>✨</Text>
+          </View>
+          <Text style={styles.introTitle}>Welcome to SkillSwap</Text>
+          <Text style={styles.introSubtitle}>
+            Exchange skills with people in your community. No money involved, just knowledge sharing.
+          </Text>
+        </View>
+      )}
+
+      {step === 2 && (
+        <View style={styles.introContainer}>
+          <View style={styles.iconCircle}>
+            <Text style={styles.iconEmoji}>👥</Text>
+          </View>
+          <Text style={styles.introTitle}>Find Your Match</Text>
+          <Text style={styles.introSubtitle}>
+            Discover people who want to learn what you know, and teach what you want to learn.
+          </Text>
+        </View>
+      )}
+
+      {step === 3 && (
+        <View style={styles.introContainer}>
+          <View style={styles.iconCircle}>
+            <Text style={styles.iconEmoji}>📅</Text>
+          </View>
+          <Text style={styles.introTitle}>Book Sessions</Text>
+          <Text style={styles.introSubtitle}>
+            Schedule skill-sharing sessions at times that work for both of you.
+          </Text>
+        </View>
+      )}
+
+      {step === 4 && (
+        <View style={styles.introContainer}>
+          <View style={styles.iconCircle}>
+            <Text style={styles.iconEmoji}>💬</Text>
+          </View>
+          <Text style={styles.introTitle}>Connect & Learn</Text>
+          <Text style={styles.introSubtitle}>
+            Chat with your matches and start your learning journey together.
+          </Text>
+        </View>
+      )}
+
+      {step === 5 && (
         <View style={styles.stepContainer}>
           <Text style={styles.title}>Create Your Profile</Text>
           <Text style={styles.subtitle}>Tell us a bit about yourself</Text>
@@ -111,7 +163,7 @@ export default function OnboardingScreen({ navigation }) {
         </View>
       )}
 
-      {step === 2 && (
+      {step === 6 && (
         <View style={styles.stepContainer}>
           <Text style={styles.title}>Skills You Can Teach</Text>
           <Text style={styles.subtitle}>Select skills you'd like to share with others</Text>
@@ -137,7 +189,7 @@ export default function OnboardingScreen({ navigation }) {
         </View>
       )}
 
-      {step === 3 && (
+      {step === 7 && (
         <View style={styles.stepContainer}>
           <Text style={styles.title}>Skills You Want to Learn</Text>
           <Text style={styles.subtitle}>Select skills you'd like to learn from others</Text>
@@ -167,7 +219,7 @@ export default function OnboardingScreen({ navigation }) {
         {renderDots()}
         <TouchableOpacity
           style={styles.actionBtn}
-          onPress={step === 3 ? handleFinish : handleNext}
+          onPress={step === 7 ? handleFinish : handleNext}
           disabled={loading}
           activeOpacity={0.8}
         >
@@ -175,10 +227,15 @@ export default function OnboardingScreen({ navigation }) {
             <ActivityIndicator color="#FFF" />
           ) : (
             <Text style={styles.actionBtnText}>
-              {step === 3 ? 'Get Started' : 'Continue →'}
+              {step === 7 ? 'Get Started' : 'Continue →'}
             </Text>
           )}
         </TouchableOpacity>
+        {step < 5 && (
+          <TouchableOpacity onPress={handleSkipIntro} style={styles.skipBtn}>
+            <Text style={styles.skipBtnText}>Skip intro</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -188,6 +245,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
+  },
+  introContainer: {
+    flex: 1,
+    paddingHorizontal: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 40,
+  },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#1E293B',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 40,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  iconEmoji: {
+    fontSize: 40,
+  },
+  introTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#F8FAFC',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  introSubtitle: {
+    fontSize: 15,
+    color: '#94A3B8',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  skipBtn: {
+    marginTop: 20,
+    paddingVertical: 10,
+  },
+  skipBtnText: {
+    color: '#94A3B8',
+    fontSize: 14,
+    fontWeight: '600',
   },
   stepContainer: {
     flex: 1,
