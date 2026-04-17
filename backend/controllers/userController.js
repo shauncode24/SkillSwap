@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const ExchangeRequest = require('../models/ExchangeRequest');
+const Session = require('../models/Session');
 
 /**
  * @route   GET /api/users/profile
@@ -7,10 +9,25 @@ const User = require('../models/User');
  */
 const getMyProfile = async (req, res) => {
   try {
-    // req.user is already populated by the protect middleware (password excluded)
+    const userId = req.user._id;
+
+    const matchesCount = await ExchangeRequest.countDocuments({
+      $or: [{ fromUser: userId }, { toUser: userId }],
+      status: 'accepted'
+    });
+
+    const sessionsCount = await Session.countDocuments({
+      participants: userId,
+      status: 'completed'
+    });
+
+    const userData = req.user.toObject ? req.user.toObject() : req.user;
+    userData.matches = matchesCount;
+    userData.totalSessions = sessionsCount;
+
     return res.status(200).json({
       success: true,
-      data: req.user,
+      data: userData,
     });
   } catch (error) {
     console.error('GetMyProfile error:', error.message);
@@ -126,9 +143,25 @@ const getUserById = async (req, res) => {
       });
     }
 
+    const userId = user._id;
+
+    const matchesCount = await ExchangeRequest.countDocuments({
+      $or: [{ fromUser: userId }, { toUser: userId }],
+      status: 'accepted'
+    });
+
+    const sessionsCount = await Session.countDocuments({
+      participants: userId,
+      status: 'completed'
+    });
+
+    const userData = user.toObject ? user.toObject() : user;
+    userData.matches = matchesCount;
+    userData.totalSessions = sessionsCount;
+
     return res.status(200).json({
       success: true,
-      data: user,
+      data: userData,
     });
   } catch (error) {
     // Handle invalid ObjectId format gracefully

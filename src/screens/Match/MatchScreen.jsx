@@ -71,7 +71,7 @@ export default function MatchScreen() {
 
   const renderMatches = () => {
     if (loading) return <ActivityIndicator style={styles.loader} size="large" color={theme.colors.primary} />;
-    
+
     if (!matches || matches.length === 0) {
       return <Text style={styles.emptyText}>No matches found. Complete your profile with skills you want to learn.</Text>;
     }
@@ -86,7 +86,7 @@ export default function MatchScreen() {
             <View key={user._id || index} style={styles.card}>
               <View style={styles.cardHeaderArea}>
                 <View style={styles.avatarHolder}>
-                  <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B'}}>✔</Text></View>
+                  <View style={styles.checkmarkBadge}><Text style={{ fontSize: 10, color: '#1E293B' }}>✔</Text></View>
                 </View>
                 <View style={styles.cardHeaderInfo}>
                   <Text style={styles.name}>{user.name}</Text>
@@ -98,7 +98,7 @@ export default function MatchScreen() {
                   </View>
                 </View>
               </View>
-              
+
               <Text style={styles.sectionLabel}>Can teach</Text>
               <View style={styles.skillsRow}>
                 {user.teachSkills?.slice(0, 3).map((skill, sdx) => (
@@ -132,35 +132,35 @@ export default function MatchScreen() {
 
   const renderRequestCard = (req, isReceived) => {
     const otherUser = isReceived ? req.fromUser : req.toUser;
-    
+
     return (
       <View key={req._id} style={styles.card}>
         <View style={styles.cardHeaderArea}>
           <View style={styles.avatarHolder}>
-             <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B'}}>✔</Text></View>
+            <View style={styles.checkmarkBadge}><Text style={{ fontSize: 10, color: '#1E293B' }}>✔</Text></View>
           </View>
           <View style={styles.cardHeaderInfo}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-               <Text style={styles.name}>{otherUser?.name || 'Unknown User'}</Text>
-               <View style={[styles.statusBadge, { backgroundColor: getStatusColor(req.status) }]}>
-                  <Text style={styles.statusText}>{req.status}</Text>
-               </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.name}>{otherUser?.name || 'Unknown User'}</Text>
+              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(req.status) }]}>
+                <Text style={styles.statusText}>{req.status}</Text>
+              </View>
             </View>
           </View>
         </View>
 
         <Text style={styles.sectionLabel}>Offered Skill</Text>
         <View style={styles.skillsRow}>
-           <View style={styles.teachTag}>
-             <Text style={styles.teachTagText}>{req.offeredSkill}</Text>
-           </View>
+          <View style={styles.teachTag}>
+            <Text style={styles.teachTagText}>{req.offeredSkill}</Text>
+          </View>
         </View>
 
         <Text style={styles.sectionLabel}>Requested Skill</Text>
         <View style={styles.skillsRow}>
-           <View style={styles.learnTag}>
-             <Text style={styles.learnTagText}>{req.requestedSkill}</Text>
-           </View>
+          <View style={styles.learnTag}>
+            <Text style={styles.learnTagText}>{req.requestedSkill}</Text>
+          </View>
         </View>
 
         {isReceived && req.status === 'pending' && (
@@ -181,7 +181,7 @@ export default function MatchScreen() {
             </TouchableOpacity>
           </View>
         )}
-        
+
         {req.status === 'accepted' && (
           <View style={styles.actionRow}>
             <TouchableOpacity
