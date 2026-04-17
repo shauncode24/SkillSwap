@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { View, Text } from 'react-native';
 
 // Auth Screens
 import LoginScreen from '../screens/Auth/LoginScreen';
@@ -33,15 +34,17 @@ const Tab = createBottomTabNavigator();
 // Tab icon helper — uses emoji as lightweight placeholders
 function TabIcon({ label, focused }) {
   const icons = {
-    Home: '🏠',
-    Discover: '🔍',
-    Matches: '🤝',
-    Chats: '💬',
-    Sessions: '📅',
-    Profile: '👤',
+    Home: 'home-outline',
+    Discover: 'search-outline',
+    Matches: 'people-circle-outline',
+    Chats: 'chatbubble-outline',
+    Sessions: 'calendar-outline',
+    Profile: 'person-outline',
   };
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{icons[label]}</Text>
+    <View style={{ opacity: focused ? 1 : 0.6 }}>
+      <Ionicons name={icons[label]} size={24} color={focused ? theme.colors.primary : theme.colors.subtext} />
+    </View>
   );
 }
 

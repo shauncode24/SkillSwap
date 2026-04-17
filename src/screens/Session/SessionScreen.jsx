@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,9 +28,9 @@ function StarRating({ rating = 0 }) {
   const half = rating - full >= 0.5;
   const stars = [];
   for (let i = 0; i < 5; i++) {
-    if (i < full) stars.push('★');
-    else if (i === full && half) stars.push('½');
-    else stars.push('☆');
+    if (i < full) stars.push(<Ionicons name='star' size={14} color='#FFD700' />);
+    else if (i === full && half) stars.push(<Ionicons name='star-half' size={14} color='#FFD700' />);
+    else stars.push(<Ionicons name='star-outline' size={14} color='#FFD700' />);
   }
   return (
     <View style={styles.starRow}>
@@ -168,7 +169,7 @@ export default function SessionScreen({ route, navigation }) {
         {session.status === 'completed' && (
           <View style={styles.reviewPrompt}>
             {session.feedbackGiven?.includes(user._id || user.id) ? (
-               <Text style={styles.reviewSubText}>✓ Review submitted</Text>
+               <Text style={styles.reviewSubText}>Review submitted</Text>
             ) : (canReviewSessions[session._id] || true) ? (
                <>
                  <Text style={styles.reviewPromptText}>Session complete! Leave a review for your partner.</Text>

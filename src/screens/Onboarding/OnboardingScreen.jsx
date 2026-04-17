@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   View,
@@ -91,7 +92,7 @@ export default function OnboardingScreen({ navigation }) {
       {step === 1 && (
         <View style={styles.introContainer}>
           <View style={styles.iconCircle}>
-            <Text style={styles.iconEmoji}>✨</Text>
+            <Ionicons name="sparkles" size={32} color="#6366F1" style={{marginBottom: 10}} />
           </View>
           <Text style={styles.introTitle}>Welcome to SkillSwap</Text>
           <Text style={styles.introSubtitle}>
@@ -103,7 +104,7 @@ export default function OnboardingScreen({ navigation }) {
       {step === 2 && (
         <View style={styles.introContainer}>
           <View style={styles.iconCircle}>
-            <Text style={styles.iconEmoji}>👥</Text>
+            <Ionicons name="people" size={32} color="#6366F1" style={{marginBottom: 10}} />
           </View>
           <Text style={styles.introTitle}>Find Your Match</Text>
           <Text style={styles.introSubtitle}>
@@ -115,7 +116,7 @@ export default function OnboardingScreen({ navigation }) {
       {step === 3 && (
         <View style={styles.introContainer}>
           <View style={styles.iconCircle}>
-            <Text style={styles.iconEmoji}>📅</Text>
+            <Ionicons name="calendar" size={32} color="#6366F1" style={{marginBottom: 10}} />
           </View>
           <Text style={styles.introTitle}>Book Sessions</Text>
           <Text style={styles.introSubtitle}>
@@ -127,7 +128,7 @@ export default function OnboardingScreen({ navigation }) {
       {step === 4 && (
         <View style={styles.introContainer}>
           <View style={styles.iconCircle}>
-            <Text style={styles.iconEmoji}>💬</Text>
+            <Ionicons name="chatbubbles" size={32} color="#6366F1" style={{marginBottom: 10}} />
           </View>
           <Text style={styles.introTitle}>Connect & Learn</Text>
           <Text style={styles.introSubtitle}>

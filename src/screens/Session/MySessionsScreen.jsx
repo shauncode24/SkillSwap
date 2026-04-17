@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,7 +40,7 @@ export default function MySessionsScreen({ navigation }) {
       <View style={styles.card}>
         <View style={styles.cardHeaderArea}>
           <View style={styles.avatarHolder}>
-            <View style={styles.checkmarkBadge}><Text style={{ fontSize: 10, color: '#1E293B' }}>✔</Text></View>
+            <View style={styles.checkmarkBadge}><Ionicons name="checkmark" size={10} color="#1E293B" /></View>
           </View>
 
           <View style={styles.cardHeaderInfo}>
@@ -56,8 +57,8 @@ export default function MySessionsScreen({ navigation }) {
         </View>
 
         <View style={styles.timeRow}>
-          <Text style={styles.timeText}>📅 {formatSessionDate(session.scheduledTime)}</Text>
-          <Text style={styles.timeText}>🕒 {formatSessionTime(session.scheduledTime)}</Text>
+          <Text style={styles.timeText}><Ionicons name="calendar" size={14} color="#94A3B8" /> {formatSessionDate(session.scheduledTime)}</Text>
+          <Text style={styles.timeText}><Ionicons name="time" size={14} color="#94A3B8" /> {formatSessionTime(session.scheduledTime)}</Text>
         </View>
 
         <View style={styles.actionRow}>

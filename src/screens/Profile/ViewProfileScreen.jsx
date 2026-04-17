@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -58,9 +59,9 @@ function StarRating({ rating = 0 }) {
   const half = rating - full >= 0.5;
   const stars = [];
   for (let i = 0; i < 5; i++) {
-    if (i < full) stars.push('★');
-    else if (i === full && half) stars.push('½');
-    else stars.push('☆');
+    if (i < full) stars.push(<Ionicons name='star' size={14} color='#FFD700' />);
+    else if (i === full && half) stars.push(<Ionicons name='star-half' size={14} color='#FFD700' />);
+    else stars.push(<Ionicons name='star-outline' size={14} color='#FFD700' />);
   }
   return (
     <View style={styles.starRow}>
@@ -156,7 +157,7 @@ export default function ViewProfileScreen({ route, navigation }) {
              showsVerticalScrollIndicator={false}
           >
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>💬 Send Request</Text>
+              <Text style={styles.modalTitle}><Ionicons name="chatbubble-ellipses" size={22} color="#F8FAFC" /> Send Request</Text>
               <Text style={styles.modalSubtitle}>Propose a skill exchange with {user.name}</Text>
 
             {matchError && <Text style={styles.modalError}>{matchError}</Text>}
@@ -260,7 +261,7 @@ export default function ViewProfileScreen({ route, navigation }) {
         <View style={styles.avatarContainer}>
             <AvatarInitials name={user.name} size={100} />
             <View style={styles.checkmarkBadge}>
-              <Text style={{ fontSize: 12, color: '#1E293B', fontWeight: 'bold' }}>✔</Text>
+              <Ionicons name="checkmark" size={12} color="#1E293B" />
             </View>
           </View>
 
@@ -270,21 +271,21 @@ export default function ViewProfileScreen({ route, navigation }) {
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={styles.statIcon}>☆ </Text>
+                <Text style={styles.statIcon}><Ionicons name="star-outline" size={24} color="#64748B" /> </Text>
                 <Text style={styles.statValue}>{user.rating ? user.rating.toFixed(1) : '0.0'}</Text>
               </View>
               <Text style={styles.statLabel}>Rating</Text>
             </View>
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={styles.statIcon}>📅 </Text>
+                <Text style={styles.statIcon}><Ionicons name="calendar-outline" size={24} color="#64748B" /> </Text>
                 <Text style={styles.statValue}>{user.totalSessions || '0'}</Text>
               </View>
               <Text style={styles.statLabel}>Total{'\n'}Sessions</Text>
             </View>
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={styles.statIcon}>👥 </Text>
+                <Text style={styles.statIcon}><Ionicons name="people-outline" size={24} color="#64748B" /> </Text>
                 <Text style={styles.statValue}>{user.matches || '0'}</Text>
               </View>
               <Text style={styles.statLabel}>Matches</Text>
@@ -296,7 +297,7 @@ export default function ViewProfileScreen({ route, navigation }) {
             activeOpacity={0.8}
             onPress={() => setModalVisible(true)}
           >
-            <Text style={styles.requestBtnText}>💬  Send Request</Text>
+            <Text style={styles.requestBtnText}><Ionicons name="chatbubbles-outline" size={16} color="#FFF" /> Send Request</Text>
           </TouchableOpacity>
         </View>
 
@@ -358,7 +359,7 @@ export default function ViewProfileScreen({ route, navigation }) {
         <Text style={styles.sectionHeading}>Reviews</Text>
         <View style={styles.tagBlockCard}>
           <Text style={styles.reviewAverage}>
-            ⭐ {user.rating ? user.rating.toFixed(1) : 'No rating'}
+            <Ionicons name="star" size={16} color="#FFD700" /> {user.rating ? user.rating.toFixed(1) : 'No rating'}
           </Text>
           {userReviews && userReviews.length > 0 ? (
             userReviews.map((rev, idx) => (

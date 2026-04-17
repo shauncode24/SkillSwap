@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   View,
@@ -65,7 +66,7 @@ export default function RegisterScreen({ navigation }) {
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.headerSection}>
-            <Text style={styles.logo}>🔄</Text>
+            <Ionicons name="sync-circle" size={80} color="#6366F1" style={{ alignSelf: "center", marginBottom: 20 }} />
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join SkillSwap today</Text>
           </View>

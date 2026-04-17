@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,7 +41,7 @@ export default function ChatsListScreen({ navigation }) {
         onPress={() => navigation.navigate('Chat', { requestId: item._id, otherUser })}
       >
         <View style={styles.avatarHolder}>
-           <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B', fontWeight: 'bold'}}>✔</Text></View>
+           <View style={styles.checkmarkBadge}><Ionicons name="checkmark" size={10} color="#1E293B" /></View>
         </View>
 
         <View style={styles.chatInfo}>

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -49,7 +50,7 @@ export default function ReviewScreen({ route, navigation }) {
         {[1, 2, 3, 4, 5].map(val => (
           <TouchableOpacity key={val} onPress={() => setRating(val)}>
              <Text style={[styles.starChar, rating >= val && styles.starFilled]}>
-               {rating >= val ? '★' : '☆'}
+               {rating >= val ? <Ionicons name='star' size={32} color='#FFD700' /> : <Ionicons name='star-outline' size={32} color='#FFD700' />}
              </Text>
           </TouchableOpacity>
         ))}

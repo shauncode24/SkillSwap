@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
@@ -62,9 +63,9 @@ function StarRating({ rating = 0 }) {
   const half = rating - full >= 0.5;
   const stars = [];
   for (let i = 0; i < 5; i++) {
-    if (i < full) stars.push('★');
-    else if (i === full && half) stars.push('½');
-    else stars.push('☆');
+    if (i < full) stars.push(<Ionicons name='star' size={14} color='#FFD700' />);
+    else if (i === full && half) stars.push(<Ionicons name='star-half' size={14} color='#FFD700' />);
+    else stars.push(<Ionicons name='star-outline' size={14} color='#FFD700' />);
   }
   return (
     <View style={styles.starRow}>
@@ -296,7 +297,7 @@ export default function MyProfileScreen() {
               style={styles.removeBtn}
               activeOpacity={0.7}
             >
-              <Text style={styles.removeBtnText}>✕</Text>
+              <Text style={styles.removeBtnText}><Ionicons name="close" size={16} color="#EF4444" /></Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -335,7 +336,7 @@ export default function MyProfileScreen() {
               style={styles.removeBtn}
               activeOpacity={0.7}
             >
-              <Text style={styles.removeBtnText}>✕</Text>
+              <Text style={styles.removeBtnText}><Ionicons name="close" size={16} color="#EF4444" /></Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -376,7 +377,7 @@ export default function MyProfileScreen() {
               style={styles.removeBtn}
               activeOpacity={0.7}
             >
-              <Text style={styles.removeBtnText}>✕</Text>
+              <Text style={styles.removeBtnText}><Ionicons name="close" size={16} color="#EF4444" /></Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -441,7 +442,7 @@ export default function MyProfileScreen() {
       <View style={styles.topBackground} />
 
       <TouchableOpacity style={styles.settingsIcon} onPress={() => setEditMode(true)}>
-        <Text style={{ fontSize: 20 }}>⚙️</Text>
+        <Ionicons name="settings-outline" size={24} color="#FFF" />
       </TouchableOpacity>
 
       <ScrollView 
@@ -453,7 +454,7 @@ export default function MyProfileScreen() {
         <View style={styles.profileCard}>
         <View style={styles.avatarContainer}>
             <AvatarInitials name={profile?.name} size={100} />
-            <View style={styles.checkmarkBadge}><Text style={{ fontSize: 12, color: '#1E293B', fontWeight: 'bold' }}>✔</Text></View>
+            <View style={styles.checkmarkBadge}><Ionicons name="checkmark" size={12} color="#1E293B" /></View>
           </View>
 
           <Text style={styles.profileName}>{profile?.name}</Text>
@@ -462,21 +463,21 @@ export default function MyProfileScreen() {
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={styles.statIcon}>☆ </Text>
+                <Text style={styles.statIcon}><Ionicons name="star-outline" size={24} color="#64748B" /> </Text>
                 <Text style={styles.statValue}>{profile?.rating ? profile.rating.toFixed(1) : '0.0'}</Text>
               </View>
               <Text style={styles.statLabel}>Rating</Text>
             </View>
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={styles.statIcon}>📅 </Text>
+                <Text style={styles.statIcon}><Ionicons name="calendar-outline" size={24} color="#64748B" /> </Text>
                 <Text style={styles.statValue}>{profile?.totalSessions || '0'}</Text>
               </View>
               <Text style={styles.statLabel}>Total{'\n'}Sessions</Text>
             </View>
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                <Text style={styles.statIcon}>👥 </Text>
+                <Text style={styles.statIcon}><Ionicons name="people-outline" size={24} color="#64748B" /> </Text>
                 <Text style={styles.statValue}>{profile?.matches || '0'}</Text>
               </View>
               <Text style={styles.statLabel}>Matches</Text>
@@ -484,7 +485,7 @@ export default function MyProfileScreen() {
           </View>
 
           <TouchableOpacity style={styles.editBtnOutline} onPress={enterEditMode} activeOpacity={0.8}>
-            <Text style={styles.editBtnOutlineText}>📝  Edit Profile</Text>
+            <Text style={styles.editBtnOutlineText}><Ionicons name="create-outline" size={16} color="#CBD5E1" />  Edit Profile</Text>
           </TouchableOpacity>
         </View>
 

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -53,11 +54,11 @@ function UserCard({ user, onPress }) {
       <View style={styles.cardHeaderArea}>
          <View style={styles.avatarHolder}>
             <AvatarInitials name={user.name} size={50} />
-            <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B', fontWeight:'bold'}}>✔</Text></View>
+            <View style={styles.checkmarkBadge}><Ionicons name="checkmark" size={10} color="#1E293B" style={{fontWeight:'bold'}} /></View>
          </View>
          <View style={styles.cardInfo}>
            <Text style={styles.cardName}>{user.name}</Text>
-           <Text style={styles.cardStats}>⭐ {user.rating?.toFixed(1) || '0.0'}   •   👥 {user.matches || '0'} matches</Text>
+           <Text style={styles.cardStats}><Ionicons name="star" size={13} color="#FFD700"/> {user.rating?.toFixed(1) || '0.0'}   •   <Ionicons name="people" size={13} color="#94A3B8"/> {user.matches || '0'} matches</Text>
          </View>
          <Text style={styles.chevron}>›</Text>
       </View>
@@ -194,7 +195,7 @@ export default function DiscoverScreen({ navigation }) {
         </View>
       ) : discoverList.length === 0 ? (
         <View style={styles.centered}>
-          <Text style={styles.emptyIcon}>🔍</Text>
+          <Ionicons name="search-outline" size={50} color="#64748B" style={{marginBottom:10}} />
           <Text style={styles.emptyText}>No users found</Text>
           <Text style={styles.emptySubtext}>
             Try adjusting your filters or search terms

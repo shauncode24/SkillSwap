@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -44,7 +45,7 @@ export default function HomeScreen({ navigation }) {
              </View>
              <Text style={styles.skillText}>{session.skill}</Text>
              <View style={{flexDirection: 'row', marginTop: 10}}>
-                <Text style={styles.cardInfo}>📅 {formatSessionDate(session.scheduledTime)}</Text>
+                <Text style={styles.cardInfo}><Ionicons name="calendar" size={14} color="#818CF8" /> {formatSessionDate(session.scheduledTime)}</Text>
              </View>
            </View>
         </View>
@@ -63,14 +64,14 @@ export default function HomeScreen({ navigation }) {
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'}}>
           <View>
             <Text style={styles.greeting}>Welcome back</Text>
-            <Text style={styles.userName}>Hi, {user?.name || 'User'} 👋</Text>
+            <Text style={styles.userName}>Hi, {user?.name || 'User'} </Text>
             <Text style={styles.subtitle}>Ready to swap some skills?</Text>
           </View>
           <TouchableOpacity 
             style={styles.bellBtn}
             onPress={() => navigation.navigate('Notifications')}
           >
-            <Text style={{fontSize: 24}}>🔔</Text>
+            <Ionicons name="notifications-outline" size={26} color="#F8FAFC" />
             {unreadCount > 0 && (
               <View style={styles.bellBadge}>
                 <Text style={styles.bellBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>

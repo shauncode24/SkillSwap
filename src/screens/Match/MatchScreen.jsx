@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -86,7 +87,7 @@ export default function MatchScreen() {
             <View key={user._id || index} style={styles.card}>
               <View style={styles.cardHeaderArea}>
                 <View style={styles.avatarHolder}>
-                  <View style={styles.checkmarkBadge}><Text style={{ fontSize: 10, color: '#1E293B' }}>✔</Text></View>
+                  <View style={styles.checkmarkBadge}><Ionicons name="checkmark" size={10} color="#1E293B" /></View>
                 </View>
                 <View style={styles.cardHeaderInfo}>
                   <Text style={styles.name}>{user.name}</Text>
@@ -137,7 +138,7 @@ export default function MatchScreen() {
       <View key={req._id} style={styles.card}>
         <View style={styles.cardHeaderArea}>
           <View style={styles.avatarHolder}>
-            <View style={styles.checkmarkBadge}><Text style={{ fontSize: 10, color: '#1E293B' }}>✔</Text></View>
+            <View style={styles.checkmarkBadge}><Ionicons name="checkmark" size={10} color="#1E293B" /></View>
           </View>
           <View style={styles.cardHeaderInfo}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
