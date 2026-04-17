@@ -91,6 +91,7 @@ const initialState = {
   user: null,
   token: null,
   isAuthenticated: false,
+  isNewUser: false,
   loading: false,
   error: null,
 };
@@ -111,6 +112,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        state.isNewUser = true;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -129,6 +131,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        state.isNewUser = false;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -147,6 +150,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        state.isNewUser = false;
         state.error = null;
       })
       .addCase(loadUserFromToken.rejected, (state, action) => {

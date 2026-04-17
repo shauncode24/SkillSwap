@@ -91,11 +91,10 @@ function AuthStack() {
 // App Stack — shown when user IS authenticated
 // Includes the tab navigator + extra screens outside the tab bar
 function AppStack() {
-  const user = useSelector((state) => state.auth.user);
-  const needsOnboarding = user && (!user.teachSkills?.length && !user.learnSkills?.length);
+  const isNewUser = useSelector((state) => state.auth.isNewUser);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={needsOnboarding ? 'Onboarding' : 'MainTabs'}>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={isNewUser ? 'Onboarding' : 'MainTabs'}>
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="MainTabs" component={AppTabs} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
