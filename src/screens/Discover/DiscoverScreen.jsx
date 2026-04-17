@@ -20,7 +20,7 @@ import theme from '../../theme';
 const LEVEL_OPTIONS = ['any', 'beginner', 'intermediate', 'advanced'];
 
 // ── Helper: Avatar with initials ──
-function AvatarInitials({ name, size = 48 }) {
+function AvatarInitials({ name, size = 50 }) {
   const initials = (name || '?')
     .split(' ')
     .map((w) => w[0])
@@ -32,33 +32,11 @@ function AvatarInitials({ name, size = 48 }) {
     <View
       style={[
         styles.avatar,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-        },
+        { width: size, height: size, borderRadius: size / 2 },
       ]}
     >
       <Text style={[styles.avatarText, { fontSize: size * 0.38 }]}>{initials}</Text>
     </View>
-  );
-}
-
-// ── Helper: Star rating ──
-function StarRating({ rating = 0 }) {
-  const full = Math.floor(rating);
-  const half = rating - full >= 0.5;
-  const stars = [];
-  for (let i = 0; i < 5; i++) {
-    if (i < full) stars.push('★');
-    else if (i === full && half) stars.push('½');
-    else stars.push('☆');
-  }
-  return (
-    <Text style={styles.miniStars}>
-      {stars.join('')}{' '}
-      <Text style={styles.miniRating}>{rating.toFixed(1)}</Text>
-    </Text>
   );
 }
 
@@ -68,29 +46,33 @@ function UserCard({ user, onPress }) {
 
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={styles.userCard}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={styles.cardRow}>
-        <AvatarInitials name={user.name} size={52} />
-        <View style={styles.cardInfo}>
-          <Text style={styles.cardName}>{user.name}</Text>
-          <StarRating rating={user.rating || 0} />
-          <View style={styles.cardSkillsRow}>
-            {topSkills.map((skill, idx) => (
-              <View key={idx} style={styles.skillChip}>
-                <Text style={styles.skillChipText}>{skill.name}</Text>
-              </View>
-            ))}
-            {(user.teachSkills || []).length > 2 && (
-              <Text style={styles.moreSkills}>
-                +{user.teachSkills.length - 2}
-              </Text>
-            )}
-          </View>
-        </View>
-        <Text style={styles.chevron}>›</Text>
+      <View style={styles.cardHeaderArea}>
+         <View style={styles.avatarHolder}>
+            <AvatarInitials name={user.name} size={50} />
+            <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B', fontWeight:'bold'}}>✔</Text></View>
+         </View>
+         <View style={styles.cardInfo}>
+           <Text style={styles.cardName}>{user.name}</Text>
+           <Text style={styles.cardStats}>⭐ {user.rating?.toFixed(1) || '0.0'}   •   👥 {user.matches || '0'} matches</Text>
+         </View>
+         <Text style={styles.chevron}>›</Text>
+      </View>
+
+      <View style={styles.skillsRow}>
+         {topSkills.map((skill, idx) => (
+           <View key={idx} style={styles.teachTag}>
+             <Text style={styles.teachTagText}>{skill.name}</Text>
+           </View>
+         ))}
+         {(user.teachSkills || []).length > 2 && (
+           <View style={[styles.teachTag, {backgroundColor: '#334155'}]}>
+              <Text style={styles.teachTagText}>+{(user.teachSkills || []).length - 2} more</Text>
+           </View>
+         )}
       </View>
     </TouchableOpacity>
   );
@@ -140,8 +122,10 @@ export default function DiscoverScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.screenTitle}>Discover</Text>
-      <Text style={styles.screenSubtitle}>Find people to learn from & teach</Text>
+      <View style={styles.headerArea}>
+        <Text style={styles.headerTitle}>Discover</Text>
+        <Text style={styles.headerSubtitle}>Find people to learn from & teach</Text>
+      </View>
 
       {/* ── Filter Bar ── */}
       <View style={styles.filterContainer}>
@@ -238,193 +222,209 @@ export default function DiscoverScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#0F172A',
+  },
+  headerArea: {
+    backgroundColor: '#1E293B',
     paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#334155',
   },
-  screenTitle: {
-    fontSize: theme.fontSizes.xxl,
-    fontWeight: '700',
-    color: theme.colors.text,
-    paddingHorizontal: theme.spacing.lg,
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#F8FAFC',
+    marginBottom: 4,
   },
-  screenSubtitle: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.subtext,
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#94A3B8',
   },
-
+  
   // ── Filter container ──
   filterContainer: {
-    backgroundColor: theme.colors.surface,
-    marginHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: theme.spacing.md,
+    backgroundColor: '#1E293B',
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
   },
   filterInput: {
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.sm,
-    padding: theme.spacing.sm + 2,
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.text,
+    backgroundColor: '#0F172A',
+    borderRadius: 8,
+    padding: 12,
+    color: '#F8FAFC',
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: theme.spacing.sm,
+    borderColor: '#334155',
   },
   segmented: {
     flexDirection: 'row',
-    marginBottom: theme.spacing.sm,
-    gap: theme.spacing.xs,
+    marginBottom: 10,
+    gap: 8,
   },
   segmentBtn: {
     flex: 1,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.background,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#0F172A',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#334155',
   },
   segmentBtnActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
+    backgroundColor: '#3730A3', // Active segment
+    borderColor: '#3730A3',
   },
   segmentText: {
-    fontSize: theme.fontSizes.sm - 2,
-    color: theme.colors.subtext,
-    textTransform: 'capitalize',
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'capitalize'
   },
   segmentTextActive: {
-    color: theme.colors.text,
-    fontWeight: '700',
+    color: '#F8FAFC',
   },
   filterBtnRow: {
     flexDirection: 'row',
-    gap: theme.spacing.sm,
+    gap: 10,
   },
   searchBtn: {
     flex: 1,
-    backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.sm + 2,
-    borderRadius: theme.borderRadius.sm,
+    backgroundColor: '#6366F1',
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
   },
   searchBtnText: {
-    color: theme.colors.text,
-    fontSize: theme.fontSizes.sm,
-    fontWeight: '700',
+    color: '#F8FAFC',
+    fontWeight: 'bold',
   },
   clearBtn: {
     flex: 1,
     backgroundColor: 'transparent',
-    paddingVertical: theme.spacing.sm + 2,
-    borderRadius: theme.borderRadius.sm,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: '#475569',
   },
   clearBtnText: {
-    color: theme.colors.subtext,
-    fontSize: theme.fontSizes.sm,
-    fontWeight: '600',
+    color: '#94A3B8',
+    fontWeight: 'bold',
   },
 
   // ── List ──
   listContent: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.xl * 2,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: theme.spacing.xl * 2,
+    paddingBottom: 40,
   },
 
   // ── User Card ──
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+  userCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 15,
   },
-  cardRow: {
+  cardHeaderArea: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
+  },
+  avatarHolder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#475569',
+    position: 'relative'
   },
   avatar: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#0F172A',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: theme.spacing.md,
   },
   avatarText: {
-    color: theme.colors.text,
+    color: '#FFF',
     fontWeight: '700',
+  },
+  checkmarkBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: '#3B82F6',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#1E293B',
   },
   cardInfo: {
     flex: 1,
+    marginLeft: 15,
   },
   cardName: {
-    fontSize: theme.fontSizes.md,
-    fontWeight: '700',
-    color: theme.colors.text,
-    marginBottom: 2,
+    color: '#F8FAFC',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  miniStars: {
-    fontSize: theme.fontSizes.sm,
-    color: '#FFD700',
-    marginBottom: theme.spacing.xs,
-  },
-  miniRating: {
-    color: theme.colors.subtext,
-    fontSize: theme.fontSizes.sm - 1,
-  },
-  cardSkillsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  skillChip: {
-    backgroundColor: theme.colors.primary + '22',
-    borderRadius: theme.borderRadius.lg,
-    paddingVertical: 2,
-    paddingHorizontal: theme.spacing.sm,
-    marginRight: theme.spacing.xs,
-  },
-  skillChipText: {
-    fontSize: theme.fontSizes.sm - 2,
-    color: theme.colors.primary,
-    fontWeight: '600',
-  },
-  moreSkills: {
-    fontSize: theme.fontSizes.sm - 2,
-    color: theme.colors.subtext,
+  cardStats: {
+    color: '#94A3B8',
+    fontSize: 12,
+    marginTop: 4,
   },
   chevron: {
-    fontSize: theme.fontSizes.xl,
-    color: theme.colors.subtext,
-    marginLeft: theme.spacing.sm,
+    color: '#475569',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  skillsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginLeft: 65, // align with text
+  },
+  teachTag: {
+    backgroundColor: '#312E81',
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  teachTagText: {
+    color: '#C7D2FE',
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'capitalize',
   },
 
   // ── Empty state ──
   emptyIcon: {
     fontSize: 48,
-    marginBottom: theme.spacing.md,
+    marginBottom: 15,
   },
   emptyText: {
-    fontSize: theme.fontSizes.lg,
+    fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
+    color: '#F8FAFC',
+    marginBottom: 8,
   },
   emptySubtext: {
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.subtext,
+    fontSize: 14,
+    color: '#94A3B8',
   },
 });
