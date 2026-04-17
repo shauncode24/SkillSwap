@@ -22,6 +22,7 @@ import SessionScreen from '../screens/Session/SessionScreen';
 import MySessionsScreen from '../screens/Session/MySessionsScreen';
 import ReviewScreen from '../screens/Review/ReviewScreen';
 import CommunityScreen from '../screens/Community/CommunityScreen';
+import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 import { selectUnreadCount } from '../redux/slices/notificationSlice';
 
 import theme from '../theme';
@@ -87,8 +88,12 @@ function AuthStack() {
 // App Stack — shown when user IS authenticated
 // Includes the tab navigator + extra screens outside the tab bar
 function AppStack() {
+  const user = useSelector((state) => state.auth.user);
+  const needsOnboarding = user && (!user.teachSkills?.length && !user.learnSkills?.length);
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={needsOnboarding ? 'Onboarding' : 'MainTabs'}>
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="MainTabs" component={AppTabs} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="ViewProfile" component={ViewProfileScreen} />
