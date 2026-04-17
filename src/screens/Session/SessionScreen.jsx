@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
@@ -45,6 +45,7 @@ export default function SessionScreen({ route, navigation }) {
   const [skill, setSkill] = useState(offeredSkill || '');
   const [date, setDate] = useState(new Date(Date.now() + 86400000)); // Default tomorrow
   const [duration, setDuration] = useState(60);
+  const { height } = useWindowDimensions();
   
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -207,7 +208,11 @@ export default function SessionScreen({ route, navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 50}}>
+    <View style={styles.container}>
+      <ScrollView 
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} 
+        contentContainerStyle={{ paddingBottom: 50 }}
+      >
       <View style={styles.header}>
          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Text style={styles.backBtnText}>← Back</Text>
@@ -295,7 +300,8 @@ export default function SessionScreen({ route, navigation }) {
          )}
       </View>
 
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

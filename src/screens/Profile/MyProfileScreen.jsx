@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  useWindowDimensions
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -119,6 +120,7 @@ export default function MyProfileScreen() {
   const [teachSkills, setTeachSkills] = useState([]);
   const [learnSkills, setLearnSkills] = useState([]);
   const [availability, setAvailability] = useState([]);
+  const { height } = useWindowDimensions();
 
   // ── Inline-add form state ──
   const [newTeachName, setNewTeachName] = useState('');

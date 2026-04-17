@@ -8,7 +8,8 @@ import {
   ActivityIndicator,
   Modal,
   TextInput,
-  Alert
+  Alert,
+  useWindowDimensions
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -89,6 +90,7 @@ export default function ViewProfileScreen({ route, navigation }) {
   const [requestedSkill, setRequestedSkill] = useState('');
   const [message, setMessage] = useState('');
   const [duration, setDuration] = useState('30');
+  const { height } = useWindowDimensions();
 
   const { userId } = route.params || {};
 
