@@ -17,7 +17,9 @@ import NotificationsScreen from '../screens/Notifications/NotificationsScreen';
 import MyProfileScreen from '../screens/Profile/MyProfileScreen';
 import ViewProfileScreen from '../screens/Profile/ViewProfileScreen';
 import ChatScreen from '../screens/Chat/ChatScreen';
+import ChatsListScreen from '../screens/Chat/ChatsListScreen';
 import SessionScreen from '../screens/Session/SessionScreen';
+import MySessionsScreen from '../screens/Session/MySessionsScreen';
 import ReviewScreen from '../screens/Review/ReviewScreen';
 import CommunityScreen from '../screens/Community/CommunityScreen';
 import { selectUnreadCount } from '../redux/slices/notificationSlice';
@@ -32,8 +34,9 @@ function TabIcon({ label, focused }) {
   const icons = {
     Home: '🏠',
     Discover: '🔍',
-    Match: '🤝',
-    Notifications: '🔔',
+    Matches: '🤝',
+    Chats: '💬',
+    Sessions: '📅',
     Profile: '👤',
   };
   return (
@@ -63,15 +66,9 @@ function AppTabs() {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Discover" component={DiscoverScreen} />
-      <Tab.Screen name="Match" component={MatchScreen} />
-      <Tab.Screen 
-        name="Notifications" 
-        component={NotificationsScreen} 
-        options={{
-          tabBarBadge: unreadCount > 0 ? (unreadCount > 99 ? '99+' : unreadCount) : null,
-          tabBarBadgeStyle: { backgroundColor: theme.colors.error, color: '#fff' }
-        }}
-      />
+      <Tab.Screen name="Matches" component={MatchScreen} />
+      <Tab.Screen name="Chats" component={ChatsListScreen} />
+      <Tab.Screen name="Sessions" component={MySessionsScreen} />
       <Tab.Screen name="Profile" component={MyProfileScreen} />
     </Tab.Navigator>
   );
@@ -93,6 +90,7 @@ function AppStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={AppTabs} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="ViewProfile" component={ViewProfileScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Session" component={SessionScreen} />
