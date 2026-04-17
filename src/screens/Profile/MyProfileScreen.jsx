@@ -17,6 +17,7 @@ import {
   selectUserError,
 } from '../../redux/slices/userSlice';
 import { fetchReviewsByUser, selectUserReviews } from '../../redux/slices/reviewSlice';
+import { logoutUser } from '../../redux/slices/authSlice';
 import theme from '../../theme';
 
 // ── Helper: Avatar with initials ──
@@ -126,6 +127,11 @@ export default function MyProfileScreen() {
   const [newLearnPriority, setNewLearnPriority] = useState('low');
   const [newAvailDay, setNewAvailDay] = useState('');
   const [newAvailSlots, setNewAvailSlots] = useState('');
+
+  // ── Logout handler ──
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
 
   // ── Fetch profile on mount ──
   useEffect(() => {
@@ -419,6 +425,9 @@ export default function MyProfileScreen() {
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           )}
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+            <Text style={styles.logoutBtnText}>Log Out</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     );
@@ -512,7 +521,10 @@ export default function MyProfileScreen() {
         </View>
 
         {/* Padding at bottom */}
-        <View style={{ height: 20 }} />
+        <View style={{ height: 10 }} />
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+           <Text style={styles.logoutBtnText}>Log Out</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -909,5 +921,20 @@ const styles = StyleSheet.create({
     color: theme.colors.subtext,
     fontSize: theme.fontSizes.md,
     fontWeight: '600',
+  },
+  logoutBtn: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderWidth: 1,
+    borderColor: '#EF4444',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  logoutBtnText: {
+    color: '#FCA5A5',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
