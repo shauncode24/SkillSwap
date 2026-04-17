@@ -79,34 +79,50 @@ export default function MatchScreen() {
     return (
       <ScrollView contentContainerStyle={styles.listContainer}>
         {matches.map((item, index) => {
-          const { user, score, matchedSkills } = item;
+          const { user, score } = item;
           const percentage = Math.round(score * 100);
 
           return (
             <View key={user._id || index} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <AvatarInitials name={user.name} />
+              <View style={styles.cardHeaderArea}>
+                <View style={styles.avatarHolder}>
+                  <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B'}}>✔</Text></View>
+                </View>
                 <View style={styles.cardHeaderInfo}>
                   <Text style={styles.name}>{user.name}</Text>
-                  <Text style={styles.score}>{percentage}% match</Text>
+                  <View style={styles.progressContainer}>
+                    <View style={styles.progressBarBg}>
+                      <View style={[styles.progressBarFill, { width: `${percentage}%` }]} />
+                    </View>
+                    <Text style={styles.scoreText}>{percentage} %</Text>
+                  </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.viewBtn}
-                  onPress={() => navigation.navigate('ViewProfile', { userId: user._id })}
-                >
-                  <Text style={styles.viewBtnText}>View Profile</Text>
-                </TouchableOpacity>
               </View>
               
-              {matchedSkills && matchedSkills.length > 0 && (
-                <View style={styles.skillsRow}>
-                  {matchedSkills.map((skill, sdx) => (
-                    <View key={sdx} style={styles.skillTag}>
-                      <Text style={styles.skillTagText}>{skill}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+              <Text style={styles.sectionLabel}>Can teach</Text>
+              <View style={styles.skillsRow}>
+                {user.teachSkills?.slice(0, 3).map((skill, sdx) => (
+                  <View key={sdx} style={styles.teachTag}>
+                    <Text style={styles.teachTagText}>{skill.name}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <Text style={styles.sectionLabel}>Wants to learn</Text>
+              <View style={styles.skillsRow}>
+                {user.learnSkills?.slice(0, 3).map((skill, sdx) => (
+                  <View key={sdx} style={styles.learnTag}>
+                    <Text style={styles.learnTagText}>{skill.name}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={styles.viewBtnOutline}
+                onPress={() => navigation.navigate('ViewProfile', { userId: user._id })}
+              >
+                <Text style={styles.viewBtnOutlineText}>View Profile</Text>
+              </TouchableOpacity>
             </View>
           );
         })}
@@ -119,38 +135,49 @@ export default function MatchScreen() {
     
     return (
       <View key={req._id} style={styles.card}>
-        <View style={styles.cardHeader}>
-          <AvatarInitials name={otherUser?.name} />
+        <View style={styles.cardHeaderArea}>
+          <View style={styles.avatarHolder}>
+             <View style={styles.checkmarkBadge}><Text style={{fontSize: 10, color: '#1E293B'}}>✔</Text></View>
+          </View>
           <View style={styles.cardHeaderInfo}>
-            <Text style={styles.name}>{otherUser?.name || 'Unknown User'}</Text>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(req.status) }]}>
-               <Text style={styles.statusText}>{req.status}</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+               <Text style={styles.name}>{otherUser?.name || 'Unknown User'}</Text>
+               <View style={[styles.statusBadge, { backgroundColor: getStatusColor(req.status) }]}>
+                  <Text style={styles.statusText}>{req.status}</Text>
+               </View>
             </View>
           </View>
         </View>
 
-        <Text style={styles.reqDetail}>
-          <Text style={{fontWeight: 'bold'}}>Offer:</Text> {req.offeredSkill}
-        </Text>
-        <Text style={styles.reqDetail}>
-          <Text style={{fontWeight: 'bold'}}>Request:</Text> {req.requestedSkill}
-        </Text>
+        <Text style={styles.sectionLabel}>Offered Skill</Text>
+        <View style={styles.skillsRow}>
+           <View style={styles.teachTag}>
+             <Text style={styles.teachTagText}>{req.offeredSkill}</Text>
+           </View>
+        </View>
+
+        <Text style={styles.sectionLabel}>Requested Skill</Text>
+        <View style={styles.skillsRow}>
+           <View style={styles.learnTag}>
+             <Text style={styles.learnTagText}>{req.requestedSkill}</Text>
+           </View>
+        </View>
 
         {isReceived && req.status === 'pending' && (
           <View style={styles.actionRow}>
             <TouchableOpacity
-              style={[styles.actionBtn, styles.acceptBtn]}
+              style={[styles.viewBtnOutline, { flex: 1, marginRight: 8, borderColor: '#4ADE80', marginTop: 10 }]}
               onPress={() => handleRespond(req._id, 'accepted')}
               disabled={requestLoading}
             >
-              <Text style={styles.actionBtnText}>Accept</Text>
+              <Text style={[styles.viewBtnOutlineText, { color: '#4ADE80' }]}>Accept</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionBtn, styles.rejectBtn]}
+              style={[styles.viewBtnOutline, { flex: 1, marginLeft: 8, borderColor: '#F87171', marginTop: 10 }]}
               onPress={() => handleRespond(req._id, 'rejected')}
               disabled={requestLoading}
             >
-              <Text style={styles.actionBtnText}>Reject</Text>
+              <Text style={[styles.viewBtnOutlineText, { color: '#F87171' }]}>Reject</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -158,10 +185,10 @@ export default function MatchScreen() {
         {req.status === 'accepted' && (
           <View style={styles.actionRow}>
             <TouchableOpacity
-              style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}
+              style={[styles.viewBtnOutline, { flex: 1, marginTop: 10 }]}
               onPress={() => navigation.navigate('Chat', { requestId: req._id, otherUser })}
             >
-              <Text style={styles.actionBtnText}>Open Chat</Text>
+              <Text style={styles.viewBtnOutlineText}>Open Chat</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -199,19 +226,22 @@ export default function MatchScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'matches' && styles.activeTab]}
-          onPress={() => setActiveTab('matches')}
-        >
-          <Text style={[styles.tabText, activeTab === 'matches' && styles.activeTabText]}>Matches</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'requests' && styles.activeTab]}
-          onPress={() => setActiveTab('requests')}
-        >
-          <Text style={[styles.tabText, activeTab === 'requests' && styles.activeTabText]}>Requests</Text>
-        </TouchableOpacity>
+      <View style={styles.headerArea}>
+        <Text style={styles.headerTitle}>Your Matches</Text>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'matches' && styles.activeTab]}
+            onPress={() => setActiveTab('matches')}
+          >
+            <Text style={[styles.tabText, activeTab === 'matches' && styles.activeTabText]}>Matches</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'requests' && styles.activeTab]}
+            onPress={() => setActiveTab('requests')}
+          >
+            <Text style={[styles.tabText, activeTab === 'requests' && styles.activeTabText]}>Requests</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -224,36 +254,47 @@ export default function MatchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#0F172A',
+  },
+  headerArea: {
+    backgroundColor: '#1E293B',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#334155',
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#F8FAFC',
+    marginBottom: 20,
   },
   tabContainer: {
     flexDirection: 'row',
-    marginTop: 50,
-    marginBottom: 10,
-    paddingHorizontal: theme.spacing.lg,
   },
   tab: {
     flex: 1,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: 12,
     alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    borderRadius: 8,
   },
   activeTab: {
-    borderBottomColor: theme.colors.primary,
+    backgroundColor: '#3730A3', // Indigo background for active tab
   },
   tabText: {
-    color: theme.colors.subtext,
+    color: '#94A3B8',
     fontSize: theme.fontSizes.md,
     fontWeight: '600',
   },
   activeTabText: {
-    color: theme.colors.primary,
+    color: '#F8FAFC',
   },
   loader: {
     marginTop: 40,
   },
   listContainer: {
+    paddingTop: 20,
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: 40,
   },
@@ -270,69 +311,122 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   sectionTitle: {
-    color: theme.colors.text,
-    fontSize: theme.fontSizes.lg,
+    color: '#F8FAFC',
+    fontSize: 18,
     fontWeight: '700',
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+    marginTop: 20,
+    marginBottom: 10,
   },
   card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-    borderColor: theme.colors.border,
-    borderWidth: 1,
+    backgroundColor: '#1E293B',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
   },
-  cardHeader: {
+  cardHeaderArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.sm,
+    marginBottom: 20,
+  },
+  avatarHolder: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: '#475569',
+    position: 'relative'
+  },
+  checkmarkBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#4ADE80',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#1E293B',
   },
   cardHeaderInfo: {
     flex: 1,
-    marginLeft: theme.spacing.md,
+    marginLeft: 15,
   },
   name: {
-    color: theme.colors.text,
-    fontSize: theme.fontSizes.md,
-    fontWeight: '700',
+    color: '#F8FAFC',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  score: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSizes.sm,
-    fontWeight: '600',
-    marginTop: 2,
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
   },
-  viewBtn: {
-    backgroundColor: theme.colors.primary + '22',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.sm,
+  progressBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#334155',
+    borderRadius: 3,
+    marginRight: 10,
   },
-  viewBtnText: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSizes.sm,
-    fontWeight: '600',
+  progressBarFill: {
+    height: 6,
+    backgroundColor: '#4ADE80',
+    borderRadius: 3,
+  },
+  scoreText: {
+    color: '#94A3B8',
+    fontSize: 12,
+  },
+  sectionLabel: {
+    color: '#94A3B8',
+    fontSize: 12,
+    marginTop: 10,
+    marginBottom: 6,
   },
   skillsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: theme.spacing.xs,
   },
-  skillTag: {
-    backgroundColor: theme.colors.background,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 6,
-    marginBottom: 6,
-    borderColor: theme.colors.primary + '55',
+  teachTag: {
+    backgroundColor: '#312E81', // Dark blue/indigo
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  teachTagText: {
+    color: '#A5B4FC',
+    fontSize: 12,
+    fontWeight: '600'
+  },
+  learnTag: {
+    backgroundColor: '#581C87', // Deep purple
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  learnTagText: {
+    color: '#D8B4FE',
+    fontSize: 12,
+    fontWeight: '600'
+  },
+  viewBtnOutline: {
+    marginTop: 15,
     borderWidth: 1,
+    borderColor: '#6366F1',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
   },
-  skillTagText: {
-    color: theme.colors.text,
-    fontSize: theme.fontSizes.sm - 2,
+  viewBtnOutlineText: {
+    color: '#818CF8',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   avatar: {
     backgroundColor: theme.colors.primary,
