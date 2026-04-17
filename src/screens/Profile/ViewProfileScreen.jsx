@@ -150,8 +150,14 @@ export default function ViewProfileScreen({ route, navigation }) {
     return (
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalOverlay}>
-          <ScrollView contentContainerStyle={styles.modalContent}>
-            <Text style={styles.modalTitle}>Send Exchange Request</Text>
+          <ScrollView 
+             style={{ width: '100%', flex: 1 }} 
+             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}
+             showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>💬 Send Request</Text>
+              <Text style={styles.modalSubtitle}>Propose a skill exchange with {user.name}</Text>
 
             {matchError && <Text style={styles.modalError}>{matchError}</Text>}
 
@@ -226,6 +232,7 @@ export default function ViewProfileScreen({ route, navigation }) {
                 </View>
               </View>
             )}
+            </View>
           </ScrollView>
         </View>
       </Modal>
@@ -637,25 +644,34 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
 
-  // ── Modal Styles ──
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   modalContent: {
-    width: '90%',
+    width: '95%',
+    maxWidth: 500,
     backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 24,
+    padding: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 20,
   },
   modalTitle: {
     color: '#F8FAFC',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
     textAlign: 'center'
+  },
+  modalSubtitle: {
+    color: '#94A3B8',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 24,
   },
   modalError: {
     color: '#EF4444',
@@ -673,68 +689,84 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
     borderColor: '#334155',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     color: '#F8FAFC',
-    padding: 12,
+    padding: 14,
+    fontSize: 15,
   },
   textArea: {
-    minHeight: 100,
-    textAlignVertical: 'top'
+    minHeight: 120,
+    textAlignVertical: 'top',
+    paddingTop: 14,
   },
   pickerContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 4
+    marginTop: 8,
+    marginBottom: 10
   },
   pickerItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 24,
     borderWidth: 1,
     borderColor: '#334155',
     backgroundColor: '#0F172A'
   },
   pickerItemActive: {
-    backgroundColor: '#3730A3',
-    borderColor: '#6366F1',
+    backgroundColor: '#6366F1',
+    borderColor: '#818CF8',
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   pickerItemText: {
     color: '#94A3B8',
-    fontSize: 13,
-    fontWeight: '500'
+    fontSize: 14,
+    fontWeight: '600'
   },
   pickerItemActiveText: {
-    color: '#F8FAFC',
+    color: '#FFF',
     fontWeight: 'bold'
   },
   modalActions: {
     flexDirection: 'row',
-    marginTop: 24,
-    gap: 12
+    marginTop: 30,
+    gap: 16
   },
   cancelBtn: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderWidth: 1,
     borderColor: '#475569',
     alignItems: 'center',
-    borderRadius: 12
+    borderRadius: 12,
+    backgroundColor: '#1E293B'
   },
   cancelBtnText: {
     color: '#CBD5E1',
-    fontWeight: '600'
+    fontSize: 15,
+    fontWeight: '700'
   },
   sendBtn: {
     flex: 1,
     backgroundColor: '#6366F1',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 12
+    paddingVertical: 16,
+    borderRadius: 12,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   sendBtnText: {
     color: '#FFF',
+    fontSize: 15,
     fontWeight: 'bold'
   }
 });
